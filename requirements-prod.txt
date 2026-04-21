@@ -1,0 +1,4 @@
+# Production only (used in Docker / Linux deployment)
+-r requirements.txt
+psycopg2-binary==2.9.9
+gunicorn==21.2.0

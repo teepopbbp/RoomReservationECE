@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}หน้าหลัก — ระบบจองห้อง{% endblock %}
+
+{% block content %}
+<h2 style="font-size:1.3rem;font-weight:800;color:#1a237e;margin-bottom:1.25rem;">
+  ยินดีต้อนรับ, {{ user.full_name|default:user.username }}
+  <span style="font-size:0.85rem;font-weight:400;color:#666;margin-left:0.5rem;">
+    ({{ user.get_role_display }})
+  </span>
+</h2>
+
+{% if user.role == 'admin' and pending_count is not None %}
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-number">{{ pending_count }}</div>
+    <div class="stat-label">รายการรอการอนุมัติ</div>
+  </div>
+</div>
+{% if pending_count > 0 %}
+<div class="alert alert-warning">
+  มีการจอง <strong>{{ pending_count }}</strong> รายการที่รอการอนุมัติ
+  — <a href="{% url 'bookings:pending' %}">คลิกเพื่อตรวจสอบ</a>
+</div>
+{% endif %}
+{% endif %}
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+
+  <div class="card">
+    <h3 class="card-title">การจองที่กำลังจะมาถึง</h3>
+    {% if upcoming %}
+    <table class="table">
+      <thead>
+        <tr><th>วันที่</th><th>ห้อง</th><th>เวลา</th><th>สถานะ</th></tr>
+      </thead>
+      <tbody>
+        {% for b in upcoming %}
+        <tr>
+          <td>{{ b.date|date:"d/m/Y" }}</td>
+          <td>{{ b.room.code }}</td>
+          <td>{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</td>
+          <td><span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div style="margin-top:0.75rem;">
+      <a href="{% url 'bookings:list' %}" class="btn btn-outline btn-sm">ดูทั้งหมด</a>
+    </div>
+    {% else %}
+    <p style="color:#aaa;font-size:0.9rem;">ไม่มีการจองที่กำลังจะมาถึง</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h3 class="card-title">เมนูด่วน</h3>
+    <div style="display:grid;gap:0.75rem;">
+      <a href="{% url 'bookings:create' %}" class="btn btn-primary">+ จองห้องใหม่</a>
+      <a href="{% url 'bookings:calendar' %}" class="btn btn-outline">ดูปฏิทินห้องว่าง</a>
+      <a href="{% url 'bookings:list' %}" class="btn btn-outline">การจองของฉัน</a>
+      {% if user.role == 'admin' %}
+      <a href="{% url 'bookings:pending' %}" class="btn btn-warning">รายการรออนุมัติ</a>
+      <a href="{% url 'reports:index' %}" class="btn btn-outline">รายงานสถิติ</a>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

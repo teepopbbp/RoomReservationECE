@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}เข้าสู่ระบบ — ระบบจองห้อง ECE{% endblock %}
+
+{% block content %}
+<div style="max-width:420px;margin:3rem auto;">
+  <div class="card">
+    <h1 class="card-title" style="text-align:center;">เข้าสู่ระบบ</h1>
+    <p style="text-align:center;color:#666;margin-bottom:1.5rem;font-size:0.9rem;">
+      ระบบจองห้องประชุมและห้องเรียน<br>ภาควิชาวิศวกรรมไฟฟ้าและคอมพิวเตอร์
+    </p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          {% for err in field.errors %}
+          <p class="error-text">{{ err }}</p>
+          {% endfor %}
+        {% endif %}
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:0.5rem;">
+        เข้าสู่ระบบด้วย TU Account
+      </button>
+    </form>
+
+    <p style="text-align:center;margin-top:1rem;font-size:0.78rem;color:#aaa;">
+      ใช้ Username/Password ของมหาวิทยาลัยธรรมศาสตร์
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}จัดการผู้ใช้{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2 class="card-title">จัดการผู้ใช้และบทบาท</h2>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>ชื่อ-นามสกุล</th>
+          <th>อีเมล</th>
+          <th>บทบาทปัจจุบัน</th>
+          <th>เปลี่ยนบทบาท</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.username }}</td>
+          <td>{{ u.full_name|default:'—' }}</td>
+          <td>{{ u.email|default:'—' }}</td>
+          <td>
+            <span class="badge {% if u.role == 'admin' %}badge-approved{% else %}badge-pending{% endif %}">
+              {{ u.get_role_display }}
+            </span>
+          </td>
+          <td>
+            {% if u.pk != request.user.pk %}
+            <form method="post" action="{% url 'accounts:change_role' u.pk %}" style="display:inline;">
+              {% csrf_token %}
+              <select name="role" class="form-control" style="width:auto;display:inline;padding:0.25rem 0.5rem;font-size:0.8rem;">
+                <option value="lecturer" {% if u.role == 'lecturer' %}selected{% endif %}>อาจารย์</option>
+                <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>ผู้ดูแลระบบ</option>
+              </select>
+              <button type="submit" class="btn btn-primary btn-sm" style="margin-left:0.4rem;">บันทึก</button>
+            </form>
+            {% else %}
+            <span style="color:#aaa;font-size:0.82rem;">(ตัวคุณเอง)</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" style="text-align:center;color:#aaa;">ยังไม่มีผู้ใช้</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
