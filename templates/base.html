@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}TU Room Booking{% endblock %}</title>
+    <style>
+        /* CSS Grid Layout */
+        .container {
+            display: grid;
+            grid-template-areas: 
+                "header header"
+                "sidebar content"
+                "footer footer";
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: 60px 1fr 40px;
+            min-height: 100vh;
+            gap: 10px;
+        }
+
+        header { grid-area: header; background: #9d2235; color: white; display: flex; align-items: center; padding: 0 20px; }
+        nav    { grid-area: sidebar; background: #f4f4f4; padding: 20px; }
+        main   { grid-area: content; padding: 20px; }
+        footer { grid-area: footer; background: #333; color: white; text-align: center; font-size: 12px; }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-areas: "header" "content" "footer";
+                grid-template-columns: 1fr;
+            }
+            nav { display: none; } /* ซ่อน sidebar ในมือถือ */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>TU Booking System</h1>
+        </header>
+        
+        <nav>
+            <ul>
+                <li><a href="/">หน้าแรก</a></li>
+                <li><a href="/bookings/">จองห้อง</a></li>
+                {% if user.role == 'admin' %}
+                <li><a href="/admin/">จัดการระบบ (Admin)</a></li>
+                {% endif %}
+                <li><a href="{% url 'logout' %}">ออกจากระบบ</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            {% block content %}
+            {% endblock %}
+        </main>
+
+        <footer>
+            &copy; 2026 Thammasat University - Computer Engineering Project
+        </footer>
+    </div>
+</body>
+</html>

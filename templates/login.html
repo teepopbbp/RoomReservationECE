@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}เข้าสู่ระบบ - TU Room Booking{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="login-header">
+            <h2>TU Authentication</h2>
+            <p>กรุณาเข้าสู่ระบบด้วยบัญชีมหาวิทยาลัยธรรมศาสตร์</p>
+        </div>
+
+        {% if error %}
+        <div class="alert-error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username (รหัสนักศึกษา/พนักงาน)</label>
+                <input type="text" name="username" id="username" required placeholder="เช่น 6510XXXXXX">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" required placeholder="รหัสผ่านเดียวกับ TU Wi-Fi">
+            </div>
+
+            <button type="submit" class="btn-login">เข้าสู่ระบบ</button>
+        </form>
+
+        <div class="login-footer">
+            <p>พบปัญหาการใช้งาน? <a href="#">ติดต่อเจ้าหน้าที่ไอที</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ใช้ CSS Grid จัดตำแหน่ง Card ให้อยู่กึ่งกลางหน้าจอ */
+    .login-wrapper {
+        display: grid;
+        place-items: center;
+        min-height: 70vh;
+    }
+
+    .login-card {
+        background: #fff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 400px;
+        border-top: 5px solid #9d2235; /* สีแดง TU */
+    }
+
+    .login-header { text-align: center; margin-bottom: 30px; }
+    .login-header h2 { margin: 0; color: #9d2235; }
+    .login-header p { color: #666; font-size: 0.9rem; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 0.9rem; }
+    
+    .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        box-sizing: border-box; /* สำคัญมากเพื่อให้ padding ไม่ทำให้ input ทะลุขอบ */
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 14px;
+        background: #9d2235;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-login:hover { background: #7a1a29; }
+
+    .alert-error {
+        background: #fff5f5;
+        color: #c53030;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        border: 1px solid #feb2b2;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .login-footer { margin-top: 25px; text-align: center; font-size: 0.85rem; color: #888; }
+    .login-footer a { color: #9d2235; text-decoration: none; }
+</style>
+{% endblock %}
