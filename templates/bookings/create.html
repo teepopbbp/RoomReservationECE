@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %}จองห้อง{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:800px;">
+  <h2 class="card-title">จองห้องประชุม / ห้องเรียน</h2>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-error">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <!-- ห้อง -->
+    <div class="form-group">
+      <label class="form-label">{{ form.room.label }}</label>
+      {{ form.room }}
+      {% if form.room.errors %}<p class="error-text">{{ form.room.errors|join:", " }}</p>{% endif %}
+    </div>
+
+    <!-- วัตถุประสงค์ -->
+    <div class="form-group">
+      <label class="form-label">{{ form.purpose_type.label }}</label>
+      <div class="radio-group">
+        {% for choice_val, choice_lbl in form.purpose_type.field.choices %}
+        <label>
+          <input type="radio" name="purpose_type" value="{{ choice_val }}"
+            {% if form.purpose_type.value == choice_val %}checked{% endif %}
+            onchange="togglePurpose(this.value)">
+          {{ choice_lbl }}
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Teaching fields -->
+    <div id="teaching-fields" style="display:none;">
+      <div class="form-row-3">
+        <div class="form-group">
+          <label class="form-label">{{ form.course_code.label }}</label>
+          {{ form.course_code }}
+          {% if form.course_code.errors %}<p class="error-text">{{ form.course_code.errors|join:", " }}</p>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label">{{ form.course_name.label }}</label>
+          {{ form.course_name }}
+          {% if form.course_name.errors %}<p class="error-text">{{ form.course_name.errors|join:", " }}</p>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label">{{ form.program.label }}</label>
+          {{ form.program }}
+          {% if form.program.errors %}<p class="error-text">{{ form.program.errors|join:", " }}</p>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Training fields -->
+    <div id="training-fields" style="display:none;">
+      <div class="form-group">
+        <label class="form-label">{{ form.event_name.label }}</label>
+        {{ form.event_name }}
+        {% if form.event_name.errors %}<p class="error-text">{{ form.event_name.errors|join:", " }}</p>{% endif %}
+      </div>
+    </div>
+
+    <!-- Date range -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">{{ form.start_date.label }}</label>
+        {{ form.start_date }}
+        {% if form.start_date.errors %}<p class="error-text">{{ form.start_date.errors|join:", " }}</p>{% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label">{{ form.end_date.label }}</label>
+        {{ form.end_date }}
+        {% if form.end_date.errors %}<p class="error-text">{{ form.end_date.errors|join:", " }}</p>{% endif %}
+      </div>
+    </div>
+
+    <!-- Days of week -->
+    <div class="form-group">
+      <label class="form-label">{{ form.weekdays.label }}</label>
+      <div class="check-group">
+        {% for choice_val, choice_lbl in form.weekdays.field.choices %}
+        <label>
+          <input type="checkbox" name="weekdays" value="{{ choice_val }}"
+            {% if choice_val|stringformat:"s" in form.weekdays.value %}checked{% endif %}>
+          {{ choice_lbl }}
+        </label>
+        {% endfor %}
+      </div>
+      <label style="margin-top:0.5rem;display:flex;align-items:center;gap:0.4rem;font-size:0.85rem;">
+        <input type="checkbox" id="select-all-days"> เลือกทุกวัน (จันทร์–ศุกร์)
+      </label>
+      {% if form.weekdays.errors %}<p class="error-text">{{ form.weekdays.errors|join:", " }}</p>{% endif %}
+    </div>
+
+    <!-- Time -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">{{ form.start_time.label }}</label>
+        {{ form.start_time }}
+        {% if form.start_time.errors %}<p class="error-text">{{ form.start_time.errors|join:", " }}</p>{% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label">{{ form.end_time.label }}</label>
+        {{ form.end_time }}
+        {% if form.end_time.errors %}<p class="error-text">{{ form.end_time.errors|join:", " }}</p>{% endif %}
+      </div>
+    </div>
+
+    <div style="margin-top:1rem;display:flex;gap:0.75rem;">
+      <button type="submit" class="btn btn-primary">ส่งคำขอจอง</button>
+      <a href="{% url 'dashboard' %}" class="btn btn-secondary">ยกเลิก</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePurpose(val) {
+  document.getElementById('teaching-fields').style.display = (val === 'teaching') ? 'block' : 'none';
+  document.getElementById('training-fields').style.display = (val === 'training') ? 'block' : 'none';
+}
+
+// Restore on page load (after validation error)
+(function() {
+  var radios = document.querySelectorAll('input[name="purpose_type"]');
+  radios.forEach(function(r) { if (r.checked) togglePurpose(r.value); });
+})();
+
+// Select all weekdays
+document.getElementById('select-all-days').addEventListener('change', function() {
+  document.querySelectorAll('input[name="weekdays"]').forEach(function(cb) {
+    cb.checked = document.getElementById('select-all-days').checked;
+  });
+});
+</script>
+{% endblock %}

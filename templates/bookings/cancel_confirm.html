@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}ยืนยันการยกเลิก{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:480px;margin:2rem auto;">
+  <h2 class="card-title">ยืนยันการยกเลิกการจอง</h2>
+  <p style="margin-bottom:1rem;">คุณต้องการยกเลิกการจองต่อไปนี้ใช่หรือไม่?</p>
+  <table class="table" style="margin-bottom:1.25rem;">
+    <tr><td><strong>ห้อง</strong></td><td>{{ booking.room }}</td></tr>
+    <tr><td><strong>วันที่</strong></td><td>{{ booking.date|date:"d/m/Y" }}</td></tr>
+    <tr><td><strong>เวลา</strong></td><td>{{ booking.start_time|time:"H:i" }}–{{ booking.end_time|time:"H:i" }}</td></tr>
+    <tr><td><strong>วัตถุประสงค์</strong></td><td>{{ booking.purpose_label }}</td></tr>
+  </table>
+  <form method="post" style="display:flex;gap:0.75rem;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">ยืนยันยกเลิก</button>
+    <a href="{% url 'bookings:list' %}" class="btn btn-secondary">กลับ</a>
+  </form>
+</div>
+{% endblock %}

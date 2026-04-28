@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}รายการรออนุมัติ{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2 class="card-title">รายการจองที่รอการอนุมัติ ({{ bookings|length }} รายการ)</h2>
+
+  {% if not bookings %}
+  <p style="color:#aaa;text-align:center;padding:2rem;">ไม่มีรายการที่รอการอนุมัติ</p>
+  {% else %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ผู้จอง</th>
+          <th>ห้อง</th>
+          <th>วันที่</th>
+          <th>เวลา</th>
+          <th>วัตถุประสงค์</th>
+          <th>วันที่ส่ง</th>
+          <th>การดำเนินการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in bookings %}
+        <tr>
+          <td>{{ b.booker.display_name }}</td>
+          <td>{{ b.room }}</td>
+          <td>{{ b.date|date:"d/m/Y" }}</td>
+          <td>{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</td>
+          <td style="font-size:0.82rem;max-width:220px;">{{ b.purpose_label }}</td>
+          <td style="font-size:0.8rem;color:#888;">{{ b.created_at|date:"d/m/Y H:i" }}</td>
+          <td>
+            <!-- Approve -->
+            <form method="post" action="{% url 'bookings:approve' b.pk %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-success btn-sm">อนุมัติ</button>
+            </form>
+            <!-- Reject toggle -->
+            <button class="btn btn-danger btn-sm" onclick="toggleReject({{ b.pk }})">ปฏิเสธ</button>
+
+            <!-- Reject inline form -->
+            <div id="reject-{{ b.pk }}" class="reject-form">
+              <form method="post" action="{% url 'bookings:reject' b.pk %}">
+                {% csrf_token %}
+                <div class="form-group" style="margin-bottom:0.5rem;">
+                  <label class="form-label" style="font-size:0.8rem;">เหตุผลที่ปฏิเสธ</label>
+                  <textarea name="rejection_reason" class="form-control" rows="2"
+                    placeholder="ระบุเหตุผล..." required style="font-size:0.85rem;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-danger btn-sm">ยืนยันปฏิเสธ</button>
+                <button type="button" class="btn btn-secondary btn-sm"
+                  onclick="toggleReject({{ b.pk }})">ยกเลิก</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleReject(id) {
+  var el = document.getElementById('reject-' + id);
+  el.classList.toggle('open');
+}
+</script>
+{% endblock %}

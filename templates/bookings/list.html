@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}การจองของฉัน{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2 class="card-title">การจองของฉัน</h2>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>วันที่</th>
+          <th>ห้อง</th>
+          <th>เวลา</th>
+          <th>วัตถุประสงค์</th>
+          <th>สถานะ</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in bookings %}
+        <tr>
+          <td>{{ b.date|date:"d/m/Y" }}</td>
+          <td>{{ b.room }}</td>
+          <td>{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</td>
+          <td style="max-width:250px;font-size:0.82rem;">{{ b.purpose_label }}</td>
+          <td>
+            <span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span>
+            {% if b.rejection_reason %}
+            <div style="font-size:0.75rem;color:#b71c1c;margin-top:0.2rem;">{{ b.rejection_reason }}</div>
+            {% endif %}
+          </td>
+          <td>
+            {% if b.can_cancel %}
+            <form method="post" action="{% url 'bookings:cancel' b.pk %}"
+                  onsubmit="return confirm('ยืนยันการยกเลิกการจองนี้?')">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">ยกเลิก</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" style="text-align:center;color:#aaa;padding:2rem;">
+            ยังไม่มีการจอง — <a href="{% url 'bookings:create' %}">จองห้องเลย</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
