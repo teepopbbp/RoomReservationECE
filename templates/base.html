@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}ระบบจองห้อง — ภาควิชา ECE{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet" />
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/style.css' %}" />
   {% block extra_css %}{% endblock %}
@@ -13,10 +14,29 @@
 <body>
 <div class="site-layout">
 
-  {% if user.is_authenticated %}
   <nav class="navbar">
-    <a href="{% url 'dashboard' %}" class="navbar-brand">ระบบจองห้อง ECE</a>
+    <!-- Left: TSE logo + system name + TU seal co-brand (side by side) -->
+    <div class="navbar-brand-group">
+      {% if user.is_authenticated %}
+      <a href="{% url 'dashboard' %}" class="navbar-brand">
+        <img src="{% static 'images/TSE_logo.png' %}" alt="TSE" width="36" height="36" />
+        <span class="navbar-brand__text">ระบบจองห้อง ECE</span>
+      </a>
+      {% else %}
+      <span class="navbar-brand">
+        <img src="{% static 'images/TSE_logo.png' %}" alt="TSE" width="36" height="36" />
+        <span class="navbar-brand__text">ระบบจองห้อง — ภาควิชา ECE</span>
+      </span>
+      {% endif %}
+      <!-- TU seal: must be no smaller than 50% of TSE logo height (min 18 px) -->
+      <img class="navbar-tu-seal" src="{% static 'images/Emblem_of_Thammasat_University.png' %}" alt="Thammasat University" width="30" height="30" />
+    </div>
+
+    <!-- Spacer -->
     <div></div>
+
+    <!-- Right: nav links -->
+    {% if user.is_authenticated %}
     <div class="navbar-nav">
       <a href="{% url 'dashboard' %}" class="nav-link">หน้าหลัก</a>
       <a href="{% url 'bookings:calendar' %}" class="nav-link">ปฏิทิน</a>
@@ -30,14 +50,10 @@
       <span class="nav-user">{{ user.full_name|default:user.username }}</span>
       <a href="{% url 'accounts:logout' %}" class="nav-link">ออกจากระบบ</a>
     </div>
-  </nav>
-  {% else %}
-  <nav class="navbar">
-    <span class="navbar-brand">ระบบจองห้อง — ภาควิชา ECE</span>
+    {% else %}
     <div></div>
-    <div></div>
+    {% endif %}
   </nav>
-  {% endif %}
 
   <main class="page-body">
     {% if messages %}
@@ -47,6 +63,14 @@
     {% endif %}
     {% block content %}{% endblock %}
   </main>
+
+  <footer class="site-footer">
+    <span>ระบบจองห้องประชุมและห้องเรียน &mdash; ภาควิชาวิศวกรรมไฟฟ้าและคอมพิวเตอร์ มหาวิทยาลัยธรรมศาสตร์</span>
+    <div class="footer-logos">
+      <img src="{% static 'images/TSE_logo.png' %}" alt="TSE" width="24" height="24" />
+      <img src="{% static 'images/Emblem_of_Thammasat_University.png' %}" alt="Thammasat University" width="24" height="24" />
+    </div>
+  </footer>
 
 </div>
 {% block extra_js %}{% endblock %}

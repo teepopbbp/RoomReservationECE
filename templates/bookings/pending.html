@@ -6,7 +6,7 @@
   <h2 class="card-title">รายการจองที่รอการอนุมัติ ({{ bookings|length }} รายการ)</h2>
 
   {% if not bookings %}
-  <p style="color:#aaa;text-align:center;padding:2rem;">ไม่มีรายการที่รอการอนุมัติ</p>
+  <p class="text-muted text-center" style="padding:2rem 0;">ไม่มีรายการที่รอการอนุมัติ</p>
   {% else %}
   <div class="table-wrap">
     <table class="table">
@@ -28,8 +28,8 @@
           <td>{{ b.room }}</td>
           <td>{{ b.date|date:"d/m/Y" }}</td>
           <td>{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</td>
-          <td style="font-size:0.82rem;max-width:220px;">{{ b.purpose_label }}</td>
-          <td style="font-size:0.8rem;color:#888;">{{ b.created_at|date:"d/m/Y H:i" }}</td>
+          <td class="td-purpose">{{ b.purpose_label }}</td>
+          <td class="td-date">{{ b.created_at|date:"d/m/Y H:i" }}</td>
           <td>
             <!-- Approve -->
             <form method="post" action="{% url 'bookings:approve' b.pk %}" style="display:inline;">
@@ -44,9 +44,9 @@
               <form method="post" action="{% url 'bookings:reject' b.pk %}">
                 {% csrf_token %}
                 <div class="form-group" style="margin-bottom:0.5rem;">
-                  <label class="form-label" style="font-size:0.8rem;">เหตุผลที่ปฏิเสธ</label>
+                  <label class="form-label">เหตุผลที่ปฏิเสธ</label>
                   <textarea name="rejection_reason" class="form-control" rows="2"
-                    placeholder="ระบุเหตุผล..." required style="font-size:0.85rem;"></textarea>
+                    placeholder="ระบุเหตุผล..." required></textarea>
                 </div>
                 <button type="submit" class="btn btn-danger btn-sm">ยืนยันปฏิเสธ</button>
                 <button type="button" class="btn btn-secondary btn-sm"
@@ -66,8 +66,7 @@
 {% block extra_js %}
 <script>
 function toggleReject(id) {
-  var el = document.getElementById('reject-' + id);
-  el.classList.toggle('open');
+  document.getElementById('reject-' + id).classList.toggle('open');
 }
 </script>
 {% endblock %}

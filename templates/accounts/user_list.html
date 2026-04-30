@@ -30,19 +30,19 @@
             {% if u.pk != request.user.pk %}
             <form method="post" action="{% url 'accounts:change_role' u.pk %}" style="display:inline;">
               {% csrf_token %}
-              <select name="role" class="form-control" style="width:auto;display:inline;padding:0.25rem 0.5rem;font-size:0.8rem;">
+              <select name="role" class="form-control form-control--inline">
                 <option value="lecturer" {% if u.role == 'lecturer' %}selected{% endif %}>อาจารย์</option>
-                <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>ผู้ดูแลระบบ</option>
+                <option value="admin"    {% if u.role == 'admin'    %}selected{% endif %}>ผู้ดูแลระบบ</option>
               </select>
-              <button type="submit" class="btn btn-primary btn-sm" style="margin-left:0.4rem;">บันทึก</button>
+              <button type="submit" class="btn btn-primary btn-sm">บันทึก</button>
             </form>
             {% else %}
-            <span style="color:#aaa;font-size:0.82rem;">(ตัวคุณเอง)</span>
+            <span class="text-muted">(ตัวคุณเอง)</span>
             {% endif %}
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="5" style="text-align:center;color:#aaa;">ยังไม่มีผู้ใช้</td></tr>
+        <tr><td colspan="5" class="td-empty">ยังไม่มีผู้ใช้</td></tr>
         {% endfor %}
       </tbody>
     </table>

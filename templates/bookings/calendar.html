@@ -13,10 +13,9 @@
        class="btn btn-sm {% if view_type == 'month' %}btn-primary{% else %}btn-outline{% endif %}">รายเดือน</a>
 
     <form method="get" style="display:flex;align-items:center;gap:0.5rem;margin:0;">
-      <input type="hidden" name="view" value="{{ view_type }}">
+      <input type="hidden" name="view"   value="{{ view_type }}">
       <input type="hidden" name="offset" value="0">
-      <select name="room" class="form-control" style="width:auto;font-size:0.85rem;padding:0.3rem 0.6rem;"
-        onchange="this.form.submit()">
+      <select name="room" class="form-control form-control--auto" onchange="this.form.submit()">
         <option value="">ทุกห้อง</option>
         {% for r in rooms %}
         <option value="{{ r.pk }}" {% if selected_room.pk == r.pk %}selected{% endif %}>{{ r }}</option>
@@ -42,31 +41,28 @@
   </div>
 
   <!-- Legend -->
-  <div style="display:flex;gap:1rem;margin-bottom:0.75rem;font-size:0.8rem;">
+  <div class="cal-legend">
     <span><span class="badge badge-pending">รอการอนุมัติ</span></span>
     <span><span class="badge badge-approved">อนุมัติแล้ว</span></span>
   </div>
 
   {% if view_type == 'week' %}
   <!-- ── Weekly view ── -->
-  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.5rem;">
+  <div class="cal-week-grid">
     {% for day, blist in week_data %}
-    <div style="background:{% if day == today %}#fffde7{% else %}#fff{% endif %};
-                border:1px solid {% if day == today %}#ffe082{% else %}#e0e0e0{% endif %};
-                border-radius:6px;padding:0.5rem;min-height:120px;">
-      <div style="font-weight:700;font-size:0.78rem;color:#283593;text-align:center;
-                  border-bottom:1px solid #e8eaf6;padding-bottom:0.3rem;margin-bottom:0.4rem;">
+    <div class="cal-week-cell{% if day == today %} cal-week-cell--today{% endif %}">
+      <div class="cal-week-cell__header">
         {{ day|date:"D" }}<br>{{ day|date:"d/m" }}
-        {% if day == today %}<br><span style="font-size:0.65rem;color:#f57c00;font-weight:800;">วันนี้</span>{% endif %}
+        {% if day == today %}<br><span class="cal-week-cell__today-label">วันนี้</span>{% endif %}
       </div>
       {% for b in blist %}
       <div class="booking-chip chip-{{ b.status }}">
         <strong>{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</strong><br>
         {{ b.room.code }}
-        {% if b.status == 'pending' %}<span style="font-size:0.65rem;"> (รอ)</span>{% endif %}
+        {% if b.status == 'pending' %}<span> (รอ)</span>{% endif %}
       </div>
       {% empty %}
-      <div style="color:#ccc;font-size:0.72rem;text-align:center;margin-top:0.5rem;">ว่าง</div>
+      <div class="cal-week-cell__empty">ว่าง</div>
       {% endfor %}
     </div>
     {% endfor %}
@@ -92,7 +88,7 @@
           {% for k, blist in date_bookings.items %}
             {% if k == day_num %}
               {% for b in blist %}
-              <div class="booking-chip chip-{{ b.status }}" style="font-size:0.68rem;">
+              <div class="booking-chip chip-{{ b.status }}">
                 {{ b.start_time|time:"H:i" }} {{ b.room.code }}
               </div>
               {% endfor %}

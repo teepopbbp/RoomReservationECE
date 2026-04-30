@@ -22,11 +22,11 @@
           <td>{{ b.date|date:"d/m/Y" }}</td>
           <td>{{ b.room }}</td>
           <td>{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</td>
-          <td style="max-width:250px;font-size:0.82rem;">{{ b.purpose_label }}</td>
+          <td class="td-purpose">{{ b.purpose_label }}</td>
           <td>
             <span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span>
             {% if b.rejection_reason %}
-            <div style="font-size:0.75rem;color:#b71c1c;margin-top:0.2rem;">{{ b.rejection_reason }}</div>
+            <div class="rejection-reason">{{ b.rejection_reason }}</div>
             {% endif %}
           </td>
           <td>
@@ -41,7 +41,7 @@
         </tr>
         {% empty %}
         <tr>
-          <td colspan="6" style="text-align:center;color:#aaa;padding:2rem;">
+          <td colspan="6" class="td-empty">
             ยังไม่มีการจอง — <a href="{% url 'bookings:create' %}">จองห้องเลย</a>
           </td>
         </tr>

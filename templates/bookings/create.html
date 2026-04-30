@@ -110,7 +110,7 @@
       </div>
     </div>
 
-    <div style="margin-top:1rem;display:flex;gap:0.75rem;">
+    <div class="card-footer" style="display:flex;gap:0.75rem;">
       <button type="submit" class="btn btn-primary">ส่งคำขอจอง</button>
       <a href="{% url 'dashboard' %}" class="btn btn-secondary">ยกเลิก</a>
     </div>
@@ -125,13 +125,11 @@ function togglePurpose(val) {
   document.getElementById('training-fields').style.display = (val === 'training') ? 'block' : 'none';
 }
 
-// Restore on page load (after validation error)
 (function() {
   var radios = document.querySelectorAll('input[name="purpose_type"]');
   radios.forEach(function(r) { if (r.checked) togglePurpose(r.value); });
 })();
 
-// Select all weekdays
 document.getElementById('select-all-days').addEventListener('change', function() {
   document.querySelectorAll('input[name="weekdays"]').forEach(function(cb) {
     cb.checked = document.getElementById('select-all-days').checked;
