@@ -1,0 +1,485 @@
+/* ═══════════════════════════════════════════════════
+   TSE Brand Guideline — Thammasat School of Engineering
+   ═══════════════════════════════════════════════════ */
+
+:root {
+  /* Brand color palette per TSE_BrandGuideline.png */
+  --color-white:        #FFFFFF;   /* Primary White — canvas/background      */
+  --color-maroon:       #8A2329;   /* Secondary 1: Maroon Red — headings/CTAs */
+  --color-maroon-dark:  #6b1a1f;   /* Maroon darkened 10 % for hover          */
+  --color-maroon-light: #f5e8e9;   /* Tint for backgrounds, table headers      */
+  --color-orange:       #FBC24E;   /* Secondary 2: Compass Orange — highlights */
+  --color-orange-dark:  #d9a033;   /* Orange darkened 10 % for hover           */
+  --color-gold:         #FDC22B;   /* Academic Gold — university-wide accents  */
+  --color-gray:         #58595B;   /* Text Gray — body text                    */
+  --color-gray-light:   #f5f5f5;   /* Page background                          */
+}
+
+/* ── Global reset & base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Avenir Next", "Century Gothic", 'Sarabun', sans-serif;
+  background: var(--color-gray-light);
+  color: var(--color-gray);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* ── Site layout: navbar / content / footer ── */
+.site-layout { display: grid; grid-template-rows: auto 1fr auto; min-height: 100vh; }
+.page-body   { padding: 1.5rem; max-width: 1280px; margin: 0 auto; width: 100%; }
+
+/* ═══════════════════════════════
+   NAVBAR
+   ═══════════════════════════════ */
+.navbar {
+  background: var(--color-orange);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 0 1.5rem;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  min-height: 64px;
+}
+
+/* Brand group: TSE logo + name + TU seal, all on the left */
+.navbar-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--color-maroon);
+  font-family: 'Montserrat', "Avenir Next", sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+/* Hard-cap all navbar images so large PNGs can't break layout */
+.navbar-brand img,
+.navbar-tu-seal {
+  display: block;
+  width: auto;
+  max-height: 36px;
+  max-width: 80px;
+  height: auto;
+  object-fit: contain;
+}
+.navbar-brand__text { line-height: 1.2; }
+.navbar-tu-seal {
+  opacity: 0.85;
+  border-left: 1px solid rgba(138,35,41,0.25);
+  padding-left: 0.5rem;
+  max-height: 30px;
+}
+
+/* Nav links */
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.nav-link {
+  color: var(--color-maroon);
+  text-decoration: none;
+  padding: 0.4rem 0.7rem;
+  border-radius: 4px;
+  font-family: 'Montserrat', "Avenir Next", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  transition: color 0.15s, background 0.15s;
+}
+.nav-link:hover  { background: rgba(138,35,41,0.1); color: var(--color-maroon-dark); }
+.nav-link.active { color: var(--color-maroon-dark); font-weight: 700; }
+.nav-user { color: var(--color-gray); font-size: 0.76rem; padding: 0 0.4rem; }
+
+/* ═══════════════════════════════
+   FOOTER
+   ═══════════════════════════════ */
+.site-footer {
+  background: var(--color-maroon);
+  color: rgba(255,255,255,0.8);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: 'Montserrat', "Avenir Next", sans-serif;
+  font-size: 0.76rem;
+}
+.site-footer a    { color: var(--color-orange); text-decoration: none; }
+.footer-logos     { display: flex; align-items: center; gap: 0.75rem; }
+.footer-logos img { display: block; max-height: 24px; width: auto; object-fit: contain; }
+
+/* ═══════════════════════════════
+   TYPOGRAPHY
+   Brand: Montserrat Bold/Medium for all headings
+   ═══════════════════════════════ */
+h1, h2, h3 {
+  font-family: 'Montserrat', "Avenir Next", sans-serif;
+  font-weight: 700;
+  color: var(--color-maroon);
+  line-height: 1.2;
+}
+h4, h5, h6 {
+  font-family: 'Montserrat', "Avenir Next", sans-serif;
+  font-weight: 500;
+  color: var(--color-gray);
+  line-height: 1.2;
+}
+.page-heading     { font-family: 'Montserrat', "Avenir Next", sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--color-maroon); margin-bottom: 1.25rem; }
+.page-heading__sub { font-size: 0.85rem; font-weight: 400; color: #888; margin-left: 0.5rem; }
+
+/* ═══════════════════════════════
+   ALERTS — Django message levels
+   ═══════════════════════════════ */
+.alert { padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1rem; font-size: 0.9rem; }
+.alert-success { background: #e8f5e9; color: #2E7D32; border-left: 4px solid #2E7D32; }
+.alert-error,
+.alert-danger   { background: var(--color-maroon-light); color: var(--color-maroon); border-left: 4px solid var(--color-maroon); }
+.alert-info     { background: #e3f2fd; color: #1565C0; border-left: 4px solid #1565C0; }
+.alert-warning  { background: #fff8e1; color: var(--color-gray); border-left: 4px solid var(--color-orange); }
+
+/* ═══════════════════════════════
+   CARDS
+   White bg, 1 px border, 4 px radius, subtle shadow
+   ═══════════════════════════════ */
+.card {
+  background: var(--color-white);
+  border: 1px solid #E0E0E0;
+  border-radius: 4px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  margin-bottom: 1.5rem;
+}
+.card-title {
+  font-family: 'Montserrat', "Avenir Next", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-maroon);
+  border-bottom: 2px solid #E0E0E0;
+  padding-bottom: 0.6rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+.card-title--center { text-align: center; }
+.card-footer        { margin-top: 0.75rem; }
+
+/* ═══════════════════════════════
+   FORMS
+   ═══════════════════════════════ */
+.form-group         { margin-bottom: 1.1rem; }
+.form-group--inline { margin-bottom: 0; }
+.form-label  { display: block; margin-bottom: 0.35rem; font-weight: 600; font-size: 0.88rem; color: var(--color-gray); }
+.form-control {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: var(--color-white);
+  color: var(--color-gray);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.form-control:focus      { outline: none; border-color: var(--color-maroon); box-shadow: 0 0 0 3px rgba(138,35,41,0.12); }
+.form-control--inline    { width: auto; display: inline; padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+.form-control--auto      { width: auto; }
+.form-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.form-hint  { font-size: 0.78rem; color: #888; margin-top: 0.2rem; }
+.error-text { font-size: 0.8rem; color: var(--color-maroon); margin-top: 0.2rem; }
+.filter-form { display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+
+/* Radio / Checkbox */
+.radio-group, .check-group { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin-top: 0.35rem; }
+.radio-group label, .check-group label { display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.9rem; }
+
+/* ═══════════════════════════════
+   BUTTONS
+   Primary = Maroon | Secondary = Compass Orange
+   Border-radius 4 px, padding 0.5rem 1.25rem
+   ═══════════════════════════════ */
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Montserrat', "Avenir Next", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.1s;
+  line-height: 1.4;
+}
+.btn:active { transform: scale(0.98); }
+
+/* Primary — Maroon Red */
+.btn-primary  { background: var(--color-maroon); color: var(--color-white); }
+.btn-primary:hover { background: var(--color-maroon-dark); }
+
+/* Secondary — Compass Orange */
+.btn-secondary { background: var(--color-orange); color: var(--color-gray); }
+.btn-secondary:hover { background: var(--color-orange-dark); }
+
+/* Warning reuses orange */
+.btn-warning  { background: var(--color-orange); color: var(--color-gray); }
+.btn-warning:hover { background: var(--color-orange-dark); }
+
+/* Success / Danger */
+.btn-success  { background: #2E7D32; color: var(--color-white); }
+.btn-success:hover { background: #1b5e20; }
+.btn-danger   { background: #c62828; color: var(--color-white); }
+.btn-danger:hover  { background: #a81f1f; }
+
+/* Outline — Maroon border */
+.btn-outline  { background: transparent; border: 1.5px solid var(--color-maroon); color: var(--color-maroon); }
+.btn-outline:hover { background: var(--color-maroon-light); }
+
+.btn-sm   { padding: 0.28rem 0.65rem; font-size: 0.8rem; }
+.btn--full { width: 100%; margin-top: 0.5rem; }
+
+/* ═══════════════════════════════
+   BADGES
+   ═══════════════════════════════ */
+.badge           { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 12px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em; }
+.badge-pending   { background: #fff3e0; color: #bf360c; }
+.badge-approved  { background: #e8f5e9; color: #1b5e20; }
+.badge-rejected  { background: var(--color-maroon-light); color: var(--color-maroon); }
+.badge-cancelled { background: #f0f0f0; color: #616161; }
+
+/* ═══════════════════════════════
+   TABLES
+   Header stripe: maroon-light bg, Montserrat Bold, maroon text
+   ═══════════════════════════════ */
+.table-wrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.table th {
+  background: var(--color-maroon-light);
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+  font-family: 'Montserrat', "Avenir Next", sans-serif;
+  font-weight: 700;
+  color: var(--color-maroon);
+  white-space: nowrap;
+}
+.table td         { padding: 0.6rem 0.85rem; border-bottom: 1px solid #efefef; vertical-align: middle; }
+.table tr:last-child td { border-bottom: none; }
+.table tbody tr:hover td { background: #fdf5f5; }
+.td-purpose { max-width: 250px; font-size: 0.82rem; }
+.td-date    { font-size: 0.8rem; color: #888; }
+.td-center  { text-align: center; }
+.td-empty   { text-align: center; color: #aaa; padding: 2rem; }
+
+/* ═══════════════════════════════
+   STAT CARDS
+   ═══════════════════════════════ */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.stat-card  { background: var(--color-white); border: 1px solid #E0E0E0; border-radius: 4px; padding: 1.25rem 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); text-align: center; }
+.stat-number { font-family: 'Montserrat', "Avenir Next", sans-serif; font-size: 2.2rem; font-weight: 700; color: var(--color-maroon); line-height: 1.1; }
+.stat-label  { color: var(--color-gray); font-size: 0.82rem; margin-top: 0.3rem; }
+
+/* ═══════════════════════════════
+   LAYOUT UTILITIES
+   ═══════════════════════════════ */
+.grid-2col  { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.btn-stack  { display: grid; gap: 0.75rem; }
+.text-muted { color: #aaa; font-size: 0.9rem; }
+.text-center { text-align: center; }
+.text-sub   { font-size: 0.8rem; color: #666; }
+.rejection-reason { font-size: 0.75rem; color: var(--color-maroon); margin-top: 0.2rem; }
+
+/* ═══════════════════════════════
+   PAGE-SPECIFIC HELPERS
+   ═══════════════════════════════ */
+/* ── Login page (full-viewport card design) ── */
+.lp-bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+.lp-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  padding-top: 48px;
+}
+.lp-avatar {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+.lp-card {
+  background: rgba(255,255,255,0.93);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 3.5rem 2rem 2rem;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+.lp-title {
+  font-family: 'Montserrat', "Avenir Next", sans-serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--color-maroon);
+  text-align: center;
+  margin-bottom: 0.3rem;
+}
+.lp-sub {
+  font-size: 0.8rem;
+  color: var(--color-gray);
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 1.75rem;
+}
+.lp-error {
+  background: #fdf0f0;
+  border: 1px solid #e8a0a5;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  color: var(--color-maroon);
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+.lp-field {
+  position: relative;
+  margin-bottom: 1rem;
+}
+.lp-field__icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-maroon);
+  border-radius: 6px 0 0 6px;
+  pointer-events: none;
+}
+.lp-field .form-control {
+  padding-left: 52px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  height: 46px;
+  font-size: 0.9rem;
+}
+.lp-field .form-control:focus {
+  border-color: var(--color-maroon);
+  box-shadow: 0 0 0 3px rgba(138,35,41,0.15);
+}
+.lp-field__error { font-size: 0.78rem; color: var(--color-maroon); margin-top: 0.25rem; }
+.lp-btn {
+  width: 100%;
+  background: var(--color-maroon);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.8rem;
+  font-family: 'Montserrat', "Avenir Next", sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  margin-top: 0.25rem;
+  transition: background 0.2s;
+}
+.lp-btn:hover { background: var(--color-maroon-dark); }
+.lp-note {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #999;
+  margin-top: 1.25rem;
+}
+
+.confirm-wrap  { max-width: 480px; margin: 2rem auto; }
+.confirm-body  { margin-bottom: 1rem; }
+.confirm-table { margin-bottom: 1.25rem; }
+
+/* ═══════════════════════════════
+   REPORTS — utilisation bar
+   ═══════════════════════════════ */
+.util-bar__wrap { display: flex; align-items: center; gap: 0.5rem; }
+.util-bar       { background: var(--color-maroon-light); border-radius: 4px; height: 10px; width: 80px; overflow: hidden; }
+.util-bar__fill { background: var(--color-maroon); height: 100%; }
+.report-note    { font-size: 0.78rem; color: #aaa; margin-top: 0.75rem; }
+
+/* ═══════════════════════════════
+   CALENDAR
+   ═══════════════════════════════ */
+.cal-controls { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.cal-title    { font-family: 'Montserrat', "Avenir Next", sans-serif; font-size: 1rem; font-weight: 700; color: var(--color-maroon); flex: 1; text-align: center; }
+.cal-legend   { display: flex; gap: 1rem; margin-bottom: 0.75rem; font-size: 0.8rem; }
+
+/* Weekly 7-column card layout */
+.cal-week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; }
+.cal-week-cell {
+  background: var(--color-white);
+  border: 1px solid #E0E0E0;
+  border-radius: 4px;
+  padding: 0.5rem;
+  min-height: 120px;
+}
+.cal-week-cell--today { background: #fffde7; border-color: var(--color-gold); }
+.cal-week-cell__header {
+  font-family: 'Montserrat', "Avenir Next", sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: var(--color-maroon);
+  text-align: center;
+  border-bottom: 1px solid #E0E0E0;
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.4rem;
+}
+.cal-week-cell__today-label { font-size: 0.65rem; color: var(--color-orange); font-weight: 700; }
+.cal-week-cell__empty       { color: #ccc; font-size: 0.72rem; text-align: center; margin-top: 0.5rem; }
+
+/* Month calendar */
+.month-grid { display: grid; grid-template-columns: repeat(7, 1fr); border: 1px solid #ddd; border-radius: 4px; overflow: hidden; font-size: 0.82rem; }
+.month-grid .day-header { background: var(--color-maroon-light); text-align: center; padding: 0.45rem; font-family: 'Montserrat', "Avenir Next", sans-serif; font-weight: 700; color: var(--color-maroon); border-bottom: 2px solid #d4a8ab; }
+.month-grid .day-cell   { min-height: 80px; padding: 0.3rem; border-right: 1px solid #e8e8e8; border-bottom: 1px solid #e8e8e8; background: var(--color-white); }
+.month-grid .day-cell:nth-child(7n) { border-right: none; }
+.month-grid .day-num    { font-weight: 700; font-size: 0.78rem; color: #555; margin-bottom: 0.2rem; }
+.month-grid .day-cell.today { background: #fffde7; }
+.month-grid .day-cell.empty { background: #fafafa; }
+
+/* Booking chips inside calendar cells */
+.booking-chip  { border-radius: 4px; padding: 0.2rem 0.4rem; margin-bottom: 0.2rem; font-size: 0.72rem; line-height: 1.3; }
+.chip-pending  { background: #fff3e0; border-left: 3px solid var(--color-orange); color: #bf360c; }
+.chip-approved { background: #e8f5e9; border-left: 3px solid #4caf50; color: #1b5e20; }
+
+/* ═══════════════════════════════
+   REJECTION INLINE FORM (pending list)
+   ═══════════════════════════════ */
+.reject-form      { display: none; background: #fff8e1; border: 1px solid var(--color-orange); border-radius: 4px; padding: 0.75rem; margin-top: 0.5rem; }
+.reject-form.open { display: block; }
+
+/* ═══════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════ */
+@media (max-width: 768px) {
+  .form-row, .form-row-3 { grid-template-columns: 1fr; }
+  .grid-2col             { grid-template-columns: 1fr; }
+  .navbar                { grid-template-columns: 1fr auto; }
+  .navbar-brand          { font-size: 0.78rem; }
+  .navbar-tu-seal        { display: none; }
+  .cal-week-grid         { grid-template-columns: repeat(7, minmax(80px, 1fr)); overflow-x: auto; }
+  .page-body             { padding: 1rem; }
+  .site-footer           { flex-direction: column; text-align: center; }
+}
