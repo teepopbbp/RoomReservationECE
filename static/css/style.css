@@ -97,7 +97,9 @@ body {
   transition: color 0.15s, background 0.15s;
 }
 .nav-link:hover  { background: rgba(138,35,41,0.1); color: var(--color-maroon-dark); }
-.nav-link.active { color: var(--color-maroon-dark); font-weight: 700; }
+.nav-link.active      { color: var(--color-maroon-dark); font-weight: 700; }
+.nav-link--admin      { background: var(--color-maroon); color: #fff !important; border-radius: 6px; }
+.nav-link--admin:hover{ background: var(--color-maroon-dark); color: #fff !important; }
 .nav-user { color: var(--color-gray); font-size: 0.76rem; padding: 0 0.4rem; }
 
 /* ═══════════════════════════════
