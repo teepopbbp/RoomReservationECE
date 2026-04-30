@@ -1,0 +1,53 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Admin — {{ title }}{% endblock %}
+
+{% block admin_content %}
+
+<div class="flex items-center gap-3 mb-6">
+  <a href="{% url 'admin_panel:room_list' %}"
+     class="text-gray-400 hover:text-maroon transition-colors">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+    </svg>
+  </a>
+  <h2 class="font-heading font-bold text-maroon text-xl">{{ title }}</h2>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden max-w-lg">
+  <div class="px-6 py-4 border-b border-gray-100 bg-maroon-light">
+    <p class="text-sm font-semibold text-maroon">ข้อมูลห้อง</p>
+  </div>
+  <div class="p-6">
+    <form method="post" novalidate class="space-y-4">
+      {% csrf_token %}
+      {% for field in form %}
+      <div>
+        <label class="block text-sm font-medium text-gray-600 mb-1.5">{{ field.label }}</label>
+        {% if field.field.widget.input_type == 'checkbox' %}
+        <label class="flex items-center gap-2 cursor-pointer">
+          {{ field }}
+          <span class="text-sm text-gray-600">{{ field.label }}</span>
+        </label>
+        {% else %}
+        {{ field }}
+        {% endif %}
+        {% if field.errors %}
+        <p class="error-text">{{ field.errors|join:", " }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+      <div class="flex gap-3 pt-2">
+        <button type="submit"
+                class="flex items-center gap-2 bg-maroon hover:bg-maroon-dark text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
+          บันทึก
+        </button>
+        <a href="{% url 'admin_panel:room_list' %}"
+           class="px-5 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:border-maroon hover:text-maroon transition-colors">
+          ยกเลิก
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

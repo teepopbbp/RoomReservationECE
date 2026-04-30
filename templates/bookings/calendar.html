@@ -1,21 +1,72 @@
 {% extends 'base.html' %}
 {% block title %}ปฏิทินห้องว่าง{% endblock %}
 
+{% block extra_css %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        maroon: { DEFAULT: '#8A2329', dark: '#6b1a1f', light: '#f5e8e9' },
+        tseorg: { DEFAULT: '#FBC24E', dark: '#d9a033' },
+        gold:   '#FDC22B',
+      },
+      fontFamily: { heading: ['Montserrat', 'Avenir Next', 'sans-serif'] }
+    }
+  }
+}
+</script>
+<style>
+  .form-control {
+    border: 1px solid #e5e7eb; border-radius: 0.5rem;
+    padding: 0.45rem 0.75rem; font-size: 0.85rem; color: #374151;
+    background: #fff; outline: none;
+  }
+  .form-control:focus { border-color: #8A2329; box-shadow: 0 0 0 2px rgba(138,35,41,0.1); }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="card">
-  <h2 class="card-title">ปฏิทินห้องว่าง</h2>
 
-  <!-- Controls -->
-  <div class="cal-controls">
-    <a href="?view=week&room={{ selected_room.pk|default:'' }}&offset=0"
-       class="btn btn-sm {% if view_type == 'week' %}btn-primary{% else %}btn-outline{% endif %}">รายสัปดาห์</a>
-    <a href="?view=month&room={{ selected_room.pk|default:'' }}&offset=0"
-       class="btn btn-sm {% if view_type == 'month' %}btn-primary{% else %}btn-outline{% endif %}">รายเดือน</a>
+<!-- ── Page header ── -->
+<div class="flex items-center justify-between mb-5">
+  <div>
+    <h2 class="font-heading font-bold text-maroon text-2xl">ปฏิทินห้องว่าง</h2>
+    <p class="text-sm text-gray-400 mt-0.5">ตรวจสอบความพร้อมของห้องก่อนการจอง</p>
+  </div>
+  <a href="{% url 'bookings:create' %}"
+     class="flex items-center gap-2 bg-maroon hover:bg-maroon-dark text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-sm">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+    </svg>
+    จองห้อง
+  </a>
+</div>
 
-    <form method="get" style="display:flex;align-items:center;gap:0.5rem;margin:0;">
+<!-- ── Controls card ── -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-5">
+  <div class="flex flex-wrap items-center gap-3">
+
+    <!-- View toggle -->
+    <div class="flex rounded-xl overflow-hidden border border-gray-200">
+      <a href="?view=week&room={{ selected_room.pk|default:'' }}&offset=0"
+         class="px-4 py-2 text-sm font-semibold transition-colors
+                {% if view_type == 'week' %}bg-maroon text-white{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
+        รายสัปดาห์
+      </a>
+      <a href="?view=month&room={{ selected_room.pk|default:'' }}&offset=0"
+         class="px-4 py-2 text-sm font-semibold transition-colors border-l border-gray-200
+                {% if view_type == 'month' %}bg-maroon text-white{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
+        รายเดือน
+      </a>
+    </div>
+
+    <!-- Room filter -->
+    <form method="get" class="flex items-center gap-2 m-0">
       <input type="hidden" name="view"   value="{{ view_type }}">
       <input type="hidden" name="offset" value="0">
-      <select name="room" class="form-control form-control--auto" onchange="this.form.submit()">
+      <select name="room" class="form-control" onchange="this.form.submit()">
         <option value="">ทุกห้อง</option>
         {% for r in rooms %}
         <option value="{{ r.pk }}" {% if selected_room.pk == r.pk %}selected{% endif %}>{{ r }}</option>
@@ -23,72 +74,169 @@
       </select>
     </form>
 
-    <a href="?view={{ view_type }}&room={{ selected_room.pk|default:'' }}&offset={{ prev_offset }}"
-       class="btn btn-outline btn-sm">← ก่อนหน้า</a>
-    <span class="cal-title">
-      {% if view_type == 'week' %}
-        {% with week_data.0.0 as first_day %}{{ first_day|date:"d/m/Y" }}{% endwith %}
-        –
-        {% with week_data.6.0 as last_day %}{{ last_day|date:"d/m/Y" }}{% endwith %}
-      {% else %}
-        {{ month_label }}
-      {% endif %}
-    </span>
-    <a href="?view={{ view_type }}&room={{ selected_room.pk|default:'' }}&offset={{ next_offset }}"
-       class="btn btn-outline btn-sm">ถัดไป →</a>
-    <a href="?view={{ view_type }}&room={{ selected_room.pk|default:'' }}&offset=0"
-       class="btn btn-secondary btn-sm">วันนี้</a>
-  </div>
+    <!-- Spacer -->
+    <div class="flex-1"></div>
 
-  <!-- Legend -->
-  <div class="cal-legend">
-    <span><span class="badge badge-pending">รอการอนุมัติ</span></span>
-    <span><span class="badge badge-approved">อนุมัติแล้ว</span></span>
-  </div>
+    <!-- Navigation -->
+    <div class="flex items-center gap-2">
+      <a href="?view={{ view_type }}&room={{ selected_room.pk|default:'' }}&offset={{ prev_offset }}"
+         class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-maroon hover:text-maroon transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/>
+        </svg>
+      </a>
 
-  {% if view_type == 'week' %}
-  <!-- ── Weekly view ── -->
-  <div class="cal-week-grid">
-    {% for day, blist in week_data %}
-    <div class="cal-week-cell{% if day == today %} cal-week-cell--today{% endif %}">
-      <div class="cal-week-cell__header">
-        {{ day|date:"D" }}<br>{{ day|date:"d/m" }}
-        {% if day == today %}<br><span class="cal-week-cell__today-label">วันนี้</span>{% endif %}
-      </div>
+      <span class="font-heading font-bold text-maroon text-sm px-3 min-w-[160px] text-center">
+        {% if view_type == 'week' %}
+          {% with week_data.0.0 as fd %}{{ fd|date:"d/m/Y" }}{% endwith %}
+          –
+          {% with week_data.6.0 as ld %}{{ ld|date:"d/m/Y" }}{% endwith %}
+        {% else %}
+          {{ month_label }}
+        {% endif %}
+      </span>
+
+      <a href="?view={{ view_type }}&room={{ selected_room.pk|default:'' }}&offset={{ next_offset }}"
+         class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-maroon hover:text-maroon transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+        </svg>
+      </a>
+
+      <a href="?view={{ view_type }}&room={{ selected_room.pk|default:'' }}&offset=0"
+         class="px-3 py-1.5 rounded-lg bg-tseorg text-maroon-dark text-xs font-bold hover:bg-tseorg-dark transition-colors">
+        วันนี้
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ── Legend ── -->
+<div class="flex items-center gap-4 mb-4 px-1">
+  <span class="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
+    <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span> รอการอนุมัติ
+  </span>
+  <span class="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
+    <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> อนุมัติแล้ว
+  </span>
+</div>
+
+{% if view_type == 'week' %}
+<!-- ══════════════════════════════
+     WEEKLY VIEW
+     ══════════════════════════════ -->
+<div class="grid grid-cols-7 gap-2">
+  {% for day, blist in week_data %}
+  {% if day == today %}
+  <!-- TODAY column -->
+  <div class="rounded-2xl overflow-hidden shadow-md border-2 border-gold">
+    <div class="bg-gradient-to-b from-maroon to-maroon-dark px-2 py-3 text-center">
+      <div class="text-tseorg text-xs font-heading font-bold uppercase tracking-widest">วันนี้</div>
+      <div class="text-white font-heading font-bold text-base">{{ day|date:"D" }}</div>
+      <div class="text-white/70 text-xs mt-0.5">{{ day|date:"d/m" }}</div>
+    </div>
+    <div class="bg-amber-50 min-h-[160px] p-2 space-y-1.5">
       {% for b in blist %}
-      <div class="booking-chip chip-{{ b.status }}">
-        <strong>{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</strong><br>
-        {{ b.room.code }}
-        {% if b.status == 'pending' %}<span> (รอ)</span>{% endif %}
+      {% if b.status == 'approved' %}
+      <div class="rounded-lg bg-emerald-500 text-white px-2 py-1.5 text-xs leading-snug">
+        <div class="font-bold">{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</div>
+        <div class="opacity-90">{{ b.room.code }}</div>
       </div>
+      {% else %}
+      <div class="rounded-lg bg-amber-400 text-amber-900 px-2 py-1.5 text-xs leading-snug">
+        <div class="font-bold">{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</div>
+        <div class="opacity-80">{{ b.room.code }} (รอ)</div>
+      </div>
+      {% endif %}
       {% empty %}
-      <div class="cal-week-cell__empty">ว่าง</div>
+      <div class="text-center text-amber-400 text-xs mt-4 font-medium">ว่าง</div>
       {% endfor %}
     </div>
-    {% endfor %}
   </div>
 
   {% else %}
-  <!-- ── Monthly view ── -->
-  <div class="month-grid">
-    <div class="day-header">จ</div>
-    <div class="day-header">อ</div>
-    <div class="day-header">พ</div>
-    <div class="day-header">พฤ</div>
-    <div class="day-header">ศ</div>
-    <div class="day-header">ส</div>
-    <div class="day-header">อา</div>
+  <!-- Normal day column -->
+  <div class="rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+    <div class="bg-maroon-light px-2 py-3 text-center">
+      <div class="text-maroon font-heading font-bold text-sm">{{ day|date:"D" }}</div>
+      <div class="text-maroon/60 text-xs mt-0.5">{{ day|date:"d/m" }}</div>
+    </div>
+    <div class="bg-white min-h-[160px] p-2 space-y-1.5">
+      {% for b in blist %}
+      {% if b.status == 'approved' %}
+      <div class="rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 px-2 py-1.5 text-xs leading-snug">
+        <div class="font-bold">{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</div>
+        <div class="opacity-75">{{ b.room.code }}</div>
+      </div>
+      {% else %}
+      <div class="rounded-lg bg-amber-50 border border-amber-200 text-amber-800 px-2 py-1.5 text-xs leading-snug">
+        <div class="font-bold">{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</div>
+        <div class="opacity-75">{{ b.room.code }} (รอ)</div>
+      </div>
+      {% endif %}
+      {% empty %}
+      <div class="text-center text-gray-300 text-xs mt-4">ว่าง</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+
+{% else %}
+<!-- ══════════════════════════════
+     MONTHLY VIEW
+     ══════════════════════════════ -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <!-- Day-of-week headers -->
+  <div class="grid grid-cols-7">
+    {% for name in day_headers %}
+    <div class="bg-maroon text-white text-center py-2.5 text-xs font-heading font-bold tracking-wide">
+      {{ name }}
+    </div>
+    {% empty %}
+    <div class="bg-maroon text-white text-center py-2.5 text-xs font-heading font-bold">จ</div>
+    <div class="bg-maroon text-white text-center py-2.5 text-xs font-heading font-bold">อ</div>
+    <div class="bg-maroon text-white text-center py-2.5 text-xs font-heading font-bold">พ</div>
+    <div class="bg-maroon text-white text-center py-2.5 text-xs font-heading font-bold">พฤ</div>
+    <div class="bg-maroon text-white text-center py-2.5 text-xs font-heading font-bold">ศ</div>
+    <div class="bg-maroon/70 text-white text-center py-2.5 text-xs font-heading font-bold">ส</div>
+    <div class="bg-maroon/70 text-white text-center py-2.5 text-xs font-heading font-bold">อา</div>
+    {% endfor %}
+  </div>
+
+  <!-- Calendar cells -->
+  <div class="grid grid-cols-7 border-l border-t border-gray-100">
     {% for week in weeks %}
       {% for day_num in week %}
         {% if day_num == 0 %}
-        <div class="day-cell empty"></div>
-        {% else %}
-        <div class="day-cell {% if day_num == today.day %}today{% endif %}">
-          <div class="day-num">{{ day_num }}</div>
+        <div class="min-h-[90px] border-r border-b border-gray-100 bg-gray-50/50"></div>
+        {% elif day_num == today.day %}
+        <!-- Today -->
+        <div class="min-h-[90px] border-r border-b border-gray-100 bg-amber-50 border-b-2 border-b-gold p-1.5">
+          <div class="w-7 h-7 rounded-full bg-maroon text-white text-xs font-bold flex items-center justify-center mb-1">
+            {{ day_num }}
+          </div>
           {% for k, blist in date_bookings.items %}
             {% if k == day_num %}
               {% for b in blist %}
-              <div class="booking-chip chip-{{ b.status }}">
+              <div class="rounded bg-{% if b.status == 'approved' %}emerald-500{% else %}amber-400{% endif %}
+                          text-white text-[10px] px-1.5 py-0.5 mb-0.5 truncate font-medium">
+                {{ b.start_time|time:"H:i" }} {{ b.room.code }}
+              </div>
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% else %}
+        <!-- Normal day -->
+        <div class="min-h-[90px] border-r border-b border-gray-100 p-1.5 hover:bg-gray-50 transition-colors">
+          <div class="text-xs font-bold text-gray-400 mb-1 w-6 text-center">{{ day_num }}</div>
+          {% for k, blist in date_bookings.items %}
+            {% if k == day_num %}
+              {% for b in blist %}
+              <div class="rounded bg-{% if b.status == 'approved' %}emerald-100 text-emerald-700 border border-emerald-200{% else %}amber-100 text-amber-700 border border-amber-200{% endif %}
+                          text-[10px] px-1.5 py-0.5 mb-0.5 truncate font-medium">
                 {{ b.start_time|time:"H:i" }} {{ b.room.code }}
               </div>
               {% endfor %}
@@ -99,7 +247,7 @@
       {% endfor %}
     {% endfor %}
   </div>
-  {% endif %}
-
 </div>
+{% endif %}
+
 {% endblock %}

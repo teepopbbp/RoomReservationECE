@@ -1,0 +1,159 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Admin — ภาพรวมระบบ{% endblock %}
+
+{% block admin_content %}
+
+<h2 class="font-heading font-bold text-maroon text-xl mb-5">ภาพรวมระบบ</h2>
+
+<!-- Stat cards -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+  <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">ห้องที่ใช้งาน</span>
+      <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/>
+        </svg>
+      </div>
+    </div>
+    <div class="text-3xl font-heading font-bold text-gray-800">{{ active_rooms }}</div>
+    <div class="text-xs text-gray-400 mt-1">จากทั้งหมด {{ total_rooms }} ห้อง</div>
+  </div>
+
+  <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">ผู้ใช้ทั้งหมด</span>
+      <div class="w-9 h-9 rounded-xl bg-violet-50 flex items-center justify-center">
+        <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/>
+        </svg>
+      </div>
+    </div>
+    <div class="text-3xl font-heading font-bold text-gray-800">{{ total_users }}</div>
+    <div class="text-xs text-gray-400 mt-1">Admin {{ admin_users }} คน</div>
+  </div>
+
+  <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">รออนุมัติ</span>
+      <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center">
+        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+    </div>
+    <div class="text-3xl font-heading font-bold {% if pending_count > 0 %}text-amber-600{% else %}text-gray-800{% endif %}">
+      {{ pending_count }}
+    </div>
+    <div class="text-xs text-gray-400 mt-1">
+      {% if pending_count > 0 %}
+      <a href="{% url 'bookings:pending' %}" class="text-amber-600 underline font-medium">ตรวจสอบเดี๋ยวนี้</a>
+      {% else %}ไม่มีรายการค้าง{% endif %}
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">อนุมัติเดือนนี้</span>
+      <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
+        <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+    </div>
+    <div class="text-3xl font-heading font-bold text-gray-800">{{ approved_month }}</div>
+    <div class="text-xs text-gray-400 mt-1">รายการในเดือนนี้</div>
+  </div>
+
+</div>
+
+<!-- Status breakdown + recent bookings -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+  <!-- Status breakdown -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+    <h3 class="font-heading font-semibold text-maroon text-sm mb-4">สถานะการจอง</h3>
+    <div class="space-y-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> รอการอนุมัติ
+        </div>
+        <span class="font-bold text-amber-600">{{ pending_count }}</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> อนุมัติแล้ว
+        </div>
+        <span class="font-bold text-emerald-600">{{ approved_month }}</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span> ปฏิเสธ
+        </div>
+        <span class="font-bold text-red-500">{{ rejected_count }}</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <span class="w-2.5 h-2.5 rounded-full bg-gray-300"></span> ยกเลิก
+        </div>
+        <span class="font-bold text-gray-500">{{ cancelled_count }}</span>
+      </div>
+    </div>
+    <div class="mt-5 pt-4 border-t border-gray-100 space-y-2">
+      <a href="{% url 'admin_panel:booking_list' %}"
+         class="flex items-center justify-between text-xs text-maroon hover:underline font-medium">
+        ดูการจองทั้งหมด <span>→</span>
+      </a>
+      <a href="{% url 'reports:index' %}"
+         class="flex items-center justify-between text-xs text-maroon hover:underline font-medium">
+        ดูรายงาน <span>→</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Recent bookings -->
+  <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+      <h3 class="font-heading font-semibold text-maroon text-sm">การจองล่าสุด</h3>
+      <a href="{% url 'admin_panel:booking_list' %}" class="text-xs text-maroon hover:underline">ดูทั้งหมด →</a>
+    </div>
+    <table class="w-full text-xs">
+      <thead class="bg-maroon-light text-maroon font-semibold">
+        <tr>
+          <th class="px-4 py-2.5 text-left">ผู้จอง</th>
+          <th class="px-4 py-2.5 text-left">ห้อง</th>
+          <th class="px-4 py-2.5 text-left">วันที่</th>
+          <th class="px-4 py-2.5 text-left">สถานะ</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        {% for b in recent_bookings %}
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="px-4 py-2.5 font-medium text-gray-700">{{ b.booker.display_name }}</td>
+          <td class="px-4 py-2.5 text-maroon font-semibold">{{ b.room.code }}</td>
+          <td class="px-4 py-2.5 text-gray-500">{{ b.date|date:"d/m/Y" }}</td>
+          <td class="px-4 py-2.5">
+            {% if b.status == 'approved' %}
+            <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">อนุมัติ</span>
+            {% elif b.status == 'pending' %}
+            <span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-semibold">รอ</span>
+            {% elif b.status == 'rejected' %}
+            <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">ปฏิเสธ</span>
+            {% else %}
+            <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-semibold">ยกเลิก</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="px-4 py-8 text-center text-gray-300">ยังไม่มีข้อมูล</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

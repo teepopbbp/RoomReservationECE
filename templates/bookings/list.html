@@ -1,53 +1,213 @@
 {% extends 'base.html' %}
 {% block title %}การจองของฉัน{% endblock %}
 
+{% block extra_css %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        maroon: { DEFAULT: '#8A2329', dark: '#6b1a1f', light: '#f5e8e9' },
+        tseorg: { DEFAULT: '#FBC24E', dark: '#d9a033' },
+      },
+      fontFamily: { heading: ['Montserrat', 'Avenir Next', 'sans-serif'] }
+    }
+  }
+}
+</script>
+{% endblock %}
+
 {% block content %}
-<div class="card">
-  <h2 class="card-title">การจองของฉัน</h2>
-  <div class="table-wrap">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>วันที่</th>
-          <th>ห้อง</th>
-          <th>เวลา</th>
-          <th>วัตถุประสงค์</th>
-          <th>สถานะ</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for b in bookings %}
-        <tr>
-          <td>{{ b.date|date:"d/m/Y" }}</td>
-          <td>{{ b.room }}</td>
-          <td>{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</td>
-          <td class="td-purpose">{{ b.purpose_label }}</td>
-          <td>
-            <span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span>
-            {% if b.rejection_reason %}
-            <div class="rejection-reason">{{ b.rejection_reason }}</div>
-            {% endif %}
-          </td>
-          <td>
-            {% if b.can_cancel %}
-            <form method="post" action="{% url 'bookings:cancel' b.pk %}"
-                  onsubmit="return confirm('ยืนยันการยกเลิกการจองนี้?')">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-danger btn-sm">ยกเลิก</button>
-            </form>
-            {% endif %}
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="6" class="td-empty">
-            ยังไม่มีการจอง — <a href="{% url 'bookings:create' %}">จองห้องเลย</a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+
+<!-- ── Page header ── -->
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h2 class="font-heading font-bold text-maroon text-2xl">การจองของฉัน</h2>
+    <p class="text-sm text-gray-400 mt-0.5">รายการจองห้องทั้งหมดของคุณ</p>
   </div>
+  <a href="{% url 'bookings:create' %}"
+     class="flex items-center gap-2 bg-maroon hover:bg-maroon-dark text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-sm">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+    </svg>
+    จองห้องใหม่
+  </a>
 </div>
+
+{% if bookings %}
+
+<!-- ── Desktop table (md+) ── -->
+<div class="hidden md:block bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="bg-maroon-light text-maroon text-xs font-heading font-semibold uppercase tracking-wide">
+        <th class="px-5 py-3.5 text-left">วันที่</th>
+        <th class="px-5 py-3.5 text-left">ห้อง</th>
+        <th class="px-5 py-3.5 text-left">เวลา</th>
+        <th class="px-5 py-3.5 text-left">วัตถุประสงค์</th>
+        <th class="px-5 py-3.5 text-left">สถานะ</th>
+        <th class="px-5 py-3.5 text-left"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-50">
+      {% for b in bookings %}
+      <tr class="hover:bg-gray-50 transition-colors group">
+
+        <!-- Date -->
+        <td class="px-5 py-4">
+          <div class="font-semibold text-gray-800">{{ b.date|date:"d/m/Y" }}</div>
+        </td>
+
+        <!-- Room -->
+        <td class="px-5 py-4">
+          <div class="font-semibold text-maroon">{{ b.room.code }}</div>
+          <div class="text-xs text-gray-400 mt-0.5">{{ b.room.name }}</div>
+        </td>
+
+        <!-- Time -->
+        <td class="px-5 py-4">
+          <div class="inline-flex items-center gap-1.5 bg-gray-100 rounded-lg px-2.5 py-1 text-gray-700 text-xs font-medium">
+            <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
+            </svg>
+            {{ b.start_time|time:"H:i" }} – {{ b.end_time|time:"H:i" }}
+          </div>
+        </td>
+
+        <!-- Purpose -->
+        <td class="px-5 py-4 text-gray-600 max-w-[200px]">
+          <div class="truncate">{{ b.purpose_label }}</div>
+        </td>
+
+        <!-- Status -->
+        <td class="px-5 py-4">
+          {% if b.status == 'approved' %}
+          <span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold px-2.5 py-1 rounded-full">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            {{ b.get_status_display }}
+          </span>
+          {% elif b.status == 'pending' %}
+          <span class="inline-flex items-center gap-1 bg-amber-100 text-amber-700 border border-amber-200 text-xs font-semibold px-2.5 py-1 rounded-full">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+            {{ b.get_status_display }}
+          </span>
+          {% elif b.status == 'rejected' %}
+          <div>
+            <span class="inline-flex items-center gap-1 bg-red-100 text-red-700 border border-red-200 text-xs font-semibold px-2.5 py-1 rounded-full">
+              <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+              {{ b.get_status_display }}
+            </span>
+            {% if b.rejection_reason %}
+            <div class="text-xs text-red-500 mt-1 max-w-[180px]">{{ b.rejection_reason }}</div>
+            {% endif %}
+          </div>
+          {% else %}
+          <span class="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1 rounded-full">
+            {{ b.get_status_display }}
+          </span>
+          {% endif %}
+        </td>
+
+        <!-- Actions -->
+        <td class="px-5 py-4">
+          {% if b.can_cancel %}
+          <form method="post" action="{% url 'bookings:cancel' b.pk %}"
+                onsubmit="return confirm('ยืนยันการยกเลิกการจองนี้?')">
+            {% csrf_token %}
+            <button type="submit"
+                    class="text-xs text-red-500 hover:text-white hover:bg-red-500 border border-red-200 hover:border-red-500 px-3 py-1.5 rounded-lg transition-all font-medium">
+              ยกเลิก
+            </button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- ── Mobile cards (< md) ── -->
+<div class="md:hidden space-y-3">
+  {% for b in bookings %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+
+    <!-- Top row: room + status -->
+    <div class="flex items-start justify-between mb-3">
+      <div>
+        <div class="font-heading font-bold text-maroon text-base">{{ b.room.code }}</div>
+        <div class="text-xs text-gray-400">{{ b.room.name }}</div>
+      </div>
+      {% if b.status == 'approved' %}
+      <span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>{{ b.get_status_display }}
+      </span>
+      {% elif b.status == 'pending' %}
+      <span class="inline-flex items-center gap-1 bg-amber-100 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>{{ b.get_status_display }}
+      </span>
+      {% elif b.status == 'rejected' %}
+      <span class="inline-flex items-center gap-1 bg-red-100 text-red-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+        <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>{{ b.get_status_display }}
+      </span>
+      {% endif %}
+    </div>
+
+    <!-- Details row -->
+    <div class="flex items-center gap-4 text-xs text-gray-500 mb-2">
+      <span class="flex items-center gap-1">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25"/>
+        </svg>
+        {{ b.date|date:"d/m/Y" }}
+      </span>
+      <span class="flex items-center gap-1">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
+        </svg>
+        {{ b.start_time|time:"H:i" }} – {{ b.end_time|time:"H:i" }}
+      </span>
+    </div>
+
+    <div class="text-xs text-gray-500 truncate mb-3">{{ b.purpose_label }}</div>
+
+    {% if b.rejection_reason %}
+    <div class="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2 mb-3">{{ b.rejection_reason }}</div>
+    {% endif %}
+
+    {% if b.can_cancel %}
+    <form method="post" action="{% url 'bookings:cancel' b.pk %}"
+          onsubmit="return confirm('ยืนยันการยกเลิกการจองนี้?')">
+      {% csrf_token %}
+      <button type="submit"
+              class="w-full text-xs text-red-500 border border-red-200 hover:bg-red-50 py-2 rounded-lg transition-colors font-medium">
+        ยกเลิกการจอง
+      </button>
+    </form>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<!-- Empty state -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center py-20 text-center">
+  <svg class="w-16 h-16 text-gray-200 mb-4" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round"
+          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5M21 18.75v-7.5M3 10.5h18"/>
+  </svg>
+  <p class="text-gray-400 font-medium mb-1">ยังไม่มีการจอง</p>
+  <p class="text-gray-300 text-sm mb-5">เริ่มจองห้องประชุมหรือห้องเรียนได้เลย</p>
+  <a href="{% url 'bookings:create' %}"
+     class="inline-flex items-center gap-2 bg-maroon hover:bg-maroon-dark text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+    </svg>
+    จองห้องเลย
+  </a>
+</div>
+{% endif %}
+
 {% endblock %}

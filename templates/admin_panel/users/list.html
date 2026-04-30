@@ -1,0 +1,91 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Admin — จัดการผู้ใช้{% endblock %}
+
+{% block admin_content %}
+
+<div class="flex items-center justify-between mb-5">
+  <div>
+    <h2 class="font-heading font-bold text-maroon text-xl">จัดการผู้ใช้</h2>
+    <p class="text-xs text-gray-400 mt-0.5">{{ users|length }} บัญชีในระบบ</p>
+  </div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-maroon-light text-maroon text-xs font-heading font-semibold uppercase tracking-wide">
+      <tr>
+        <th class="px-5 py-3.5 text-left">ชื่อ-นามสกุล</th>
+        <th class="px-5 py-3.5 text-left">Username</th>
+        <th class="px-5 py-3.5 text-left">อีเมล</th>
+        <th class="px-5 py-3.5 text-center">บทบาท</th>
+        <th class="px-5 py-3.5 text-center">สถานะ</th>
+        <th class="px-5 py-3.5 text-right">การดำเนินการ</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-50">
+      {% for u in users %}
+      <tr class="hover:bg-gray-50 transition-colors {% if not u.is_active %}opacity-50{% endif %}">
+        <td class="px-5 py-4">
+          <div class="font-semibold text-gray-800">{{ u.full_name|default:"—" }}</div>
+        </td>
+        <td class="px-5 py-4 text-gray-500 font-mono text-xs">{{ u.username }}</td>
+        <td class="px-5 py-4 text-gray-500 text-xs">{{ u.email|default:"—" }}</td>
+        <td class="px-5 py-4 text-center">
+          {% if u.role == 'admin' %}
+          <span class="inline-block bg-maroon text-white text-xs font-semibold px-2.5 py-1 rounded-full">ผู้ดูแลระบบ</span>
+          {% else %}
+          <span class="inline-block bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1 rounded-full">อาจารย์</span>
+          {% endif %}
+        </td>
+        <td class="px-5 py-4 text-center">
+          {% if u.is_active %}
+          <span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ใช้งานอยู่
+          </span>
+          {% else %}
+          <span class="inline-flex items-center gap-1 bg-red-100 text-red-600 text-xs font-semibold px-2.5 py-1 rounded-full">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> ระงับแล้ว
+          </span>
+          {% endif %}
+        </td>
+        <td class="px-5 py-4">
+          <div class="flex items-center justify-end gap-2">
+
+            <!-- Change role -->
+            <form method="post" action="{% url 'admin_panel:user_role' u.pk %}">
+              {% csrf_token %}
+              <select name="role" onchange="this.form.submit()"
+                      class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 focus:outline-none focus:border-maroon">
+                <option value="lecturer" {% if u.role == 'lecturer' %}selected{% endif %}>อาจารย์</option>
+                <option value="admin"    {% if u.role == 'admin'    %}selected{% endif %}>ผู้ดูแลระบบ</option>
+              </select>
+            </form>
+
+            <!-- Toggle active -->
+            {% if u != request.user %}
+            <form method="post" action="{% url 'admin_panel:user_toggle' u.pk %}"
+                  onsubmit="return confirm('{% if u.is_active %}ระงับ{% else %}เปิดใช้งาน{% endif %}บัญชี {{ u.display_name }} ใช่หรือไม่?')">
+              {% csrf_token %}
+              <button type="submit"
+                      class="text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors
+                             {% if u.is_active %}text-red-500 border-red-100 hover:bg-red-50{% else %}text-emerald-600 border-emerald-200 hover:bg-emerald-50{% endif %}">
+                {% if u.is_active %}ระงับ{% else %}เปิดใช้งาน{% endif %}
+              </button>
+            </form>
+            {% else %}
+            <span class="text-xs text-gray-300 px-3 py-1.5">(คุณ)</span>
+            {% endif %}
+
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="px-5 py-12 text-center text-gray-300 text-sm">ไม่มีผู้ใช้ในระบบ</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

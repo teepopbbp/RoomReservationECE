@@ -1,128 +1,244 @@
 {% extends 'base.html' %}
 {% block title %}จองห้อง{% endblock %}
 
+{% block extra_css %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        maroon: { DEFAULT: '#8A2329', dark: '#6b1a1f', light: '#f5e8e9' },
+        tseorg: { DEFAULT: '#FBC24E', dark: '#d9a033' },
+      },
+      fontFamily: { heading: ['Montserrat', 'Avenir Next', 'sans-serif'] }
+    }
+  }
+}
+</script>
+<style>
+  /* Django-rendered inputs inherit these */
+  .form-control {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.875rem;
+    font-size: 0.875rem;
+    color: #374151;
+    background: #fff;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .form-control:focus {
+    border-color: #8A2329;
+    box-shadow: 0 0 0 3px rgba(138,35,41,0.1);
+  }
+  .error-text { font-size: 0.75rem; color: #8A2329; margin-top: 0.25rem; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="card" style="max-width:800px;">
-  <h2 class="card-title">จองห้องประชุม / ห้องเรียน</h2>
 
-  <form method="post" novalidate>
-    {% csrf_token %}
+<!-- Page header -->
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h2 class="font-heading font-bold text-maroon text-2xl">จองห้องประชุม / ห้องเรียน</h2>
+    <p class="text-sm text-gray-400 mt-0.5">กรอกข้อมูลเพื่อส่งคำขอจองห้อง</p>
+  </div>
+  <a href="{% url 'dashboard' %}"
+     class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-maroon transition-colors">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+    </svg>
+    กลับหน้าหลัก
+  </a>
+</div>
 
-    {% if form.non_field_errors %}
-    <div class="alert alert-error">{{ form.non_field_errors }}</div>
-    {% endif %}
+<form method="post" novalidate class="space-y-5">
+{% csrf_token %}
 
-    <!-- ห้อง -->
-    <div class="form-group">
-      <label class="form-label">{{ form.room.label }}</label>
-      {{ form.room }}
-      {% if form.room.errors %}<p class="error-text">{{ form.room.errors|join:", " }}</p>{% endif %}
-    </div>
+{% if form.non_field_errors %}
+<div class="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-5 py-4 text-sm text-red-700">
+  <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/>
+  </svg>
+  <div>{{ form.non_field_errors }}</div>
+</div>
+{% endif %}
 
-    <!-- วัตถุประสงค์ -->
-    <div class="form-group">
-      <label class="form-label">{{ form.purpose_type.label }}</label>
-      <div class="radio-group">
-        {% for choice_val, choice_lbl in form.purpose_type.field.choices %}
-        <label>
-          <input type="radio" name="purpose_type" value="{{ choice_val }}"
-            {% if form.purpose_type.value == choice_val %}checked{% endif %}
-            onchange="togglePurpose(this.value)">
+<!-- ── Section: Room ── -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <div class="flex items-center gap-3 px-6 py-4 border-b border-gray-100 bg-maroon-light">
+    <svg class="w-5 h-5 text-maroon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/>
+    </svg>
+    <h3 class="font-heading font-semibold text-maroon text-sm">เลือกห้อง</h3>
+  </div>
+  <div class="p-6">
+    <label class="block text-sm font-medium text-gray-600 mb-1.5">{{ form.room.label }}</label>
+    {{ form.room }}
+    {% if form.room.errors %}<p class="error-text">{{ form.room.errors|join:", " }}</p>{% endif %}
+  </div>
+</div>
+
+<!-- ── Section: Purpose ── -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <div class="flex items-center gap-3 px-6 py-4 border-b border-gray-100 bg-maroon-light">
+    <svg class="w-5 h-5 text-maroon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/>
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/>
+    </svg>
+    <h3 class="font-heading font-semibold text-maroon text-sm">วัตถุประสงค์การใช้ห้อง</h3>
+  </div>
+  <div class="p-6">
+    <label class="block text-sm font-medium text-gray-600 mb-3">{{ form.purpose_type.label }}</label>
+    <div class="flex gap-3 flex-wrap">
+      {% for choice_val, choice_lbl in form.purpose_type.field.choices %}
+      <label class="cursor-pointer">
+        <input type="radio" name="purpose_type" value="{{ choice_val }}"
+               class="sr-only peer"
+               {% if form.purpose_type.value == choice_val %}checked{% endif %}
+               onchange="togglePurpose(this.value)">
+        <span class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600
+                     peer-checked:bg-maroon peer-checked:text-white peer-checked:border-maroon
+                     hover:border-maroon hover:text-maroon transition-all select-none">
           {{ choice_lbl }}
-        </label>
-        {% endfor %}
-      </div>
+        </span>
+      </label>
+      {% endfor %}
     </div>
+  </div>
 
-    <!-- Teaching fields -->
-    <div id="teaching-fields" style="display:none;">
-      <div class="form-row-3">
-        <div class="form-group">
-          <label class="form-label">{{ form.course_code.label }}</label>
+  <!-- Teaching fields -->
+  <div id="teaching-fields" class="px-6 pb-6 hidden">
+    <div class="border-t border-gray-100 pt-5">
+      <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">ข้อมูลรายวิชา</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1.5">{{ form.course_code.label }}</label>
           {{ form.course_code }}
           {% if form.course_code.errors %}<p class="error-text">{{ form.course_code.errors|join:", " }}</p>{% endif %}
         </div>
-        <div class="form-group">
-          <label class="form-label">{{ form.course_name.label }}</label>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1.5">{{ form.course_name.label }}</label>
           {{ form.course_name }}
           {% if form.course_name.errors %}<p class="error-text">{{ form.course_name.errors|join:", " }}</p>{% endif %}
         </div>
-        <div class="form-group">
-          <label class="form-label">{{ form.program.label }}</label>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1.5">{{ form.program.label }}</label>
           {{ form.program }}
           {% if form.program.errors %}<p class="error-text">{{ form.program.errors|join:", " }}</p>{% endif %}
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Training fields -->
-    <div id="training-fields" style="display:none;">
-      <div class="form-group">
-        <label class="form-label">{{ form.event_name.label }}</label>
+  <!-- Training fields -->
+  <div id="training-fields" class="px-6 pb-6 hidden">
+    <div class="border-t border-gray-100 pt-5">
+      <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">ข้อมูลกิจกรรม</p>
+      <div>
+        <label class="block text-sm font-medium text-gray-600 mb-1.5">{{ form.event_name.label }}</label>
         {{ form.event_name }}
         {% if form.event_name.errors %}<p class="error-text">{{ form.event_name.errors|join:", " }}</p>{% endif %}
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ── Section: Schedule ── -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <div class="flex items-center gap-3 px-6 py-4 border-b border-gray-100 bg-maroon-light">
+    <svg class="w-5 h-5 text-maroon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5M21 18.75v-7.5M3 10.5h18"/>
+    </svg>
+    <h3 class="font-heading font-semibold text-maroon text-sm">ช่วงเวลาการจอง</h3>
+  </div>
+  <div class="p-6 space-y-6">
 
     <!-- Date range -->
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">{{ form.start_date.label }}</label>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-600 mb-1.5">{{ form.start_date.label }}</label>
         {{ form.start_date }}
         {% if form.start_date.errors %}<p class="error-text">{{ form.start_date.errors|join:", " }}</p>{% endif %}
       </div>
-      <div class="form-group">
-        <label class="form-label">{{ form.end_date.label }}</label>
+      <div>
+        <label class="block text-sm font-medium text-gray-600 mb-1.5">{{ form.end_date.label }}</label>
         {{ form.end_date }}
         {% if form.end_date.errors %}<p class="error-text">{{ form.end_date.errors|join:", " }}</p>{% endif %}
       </div>
     </div>
 
     <!-- Days of week -->
-    <div class="form-group">
-      <label class="form-label">{{ form.weekdays.label }}</label>
-      <div class="check-group">
+    <div>
+      <label class="block text-sm font-medium text-gray-600 mb-3">{{ form.weekdays.label }}</label>
+      <div class="flex flex-wrap gap-2 mb-3">
         {% for choice_val, choice_lbl in form.weekdays.field.choices %}
-        <label>
+        <label class="cursor-pointer">
           <input type="checkbox" name="weekdays" value="{{ choice_val }}"
-            {% if choice_val|stringformat:"s" in form.weekdays.value %}checked{% endif %}>
-          {{ choice_lbl }}
+                 class="sr-only peer"
+                 {% if choice_val|stringformat:"s" in form.weekdays.value %}checked{% endif %}>
+          <span class="inline-block px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600
+                       peer-checked:bg-maroon peer-checked:text-white peer-checked:border-maroon
+                       hover:border-maroon hover:text-maroon transition-all select-none">
+            {{ choice_lbl }}
+          </span>
         </label>
         {% endfor %}
       </div>
-      <label style="margin-top:0.5rem;display:flex;align-items:center;gap:0.4rem;font-size:0.85rem;">
-        <input type="checkbox" id="select-all-days"> เลือกทุกวัน (จันทร์–ศุกร์)
+      <label class="inline-flex items-center gap-2 text-sm text-gray-500 cursor-pointer hover:text-maroon transition-colors">
+        <input type="checkbox" id="select-all-days"
+               class="w-4 h-4 accent-[#8A2329] rounded">
+        เลือกทุกวัน (จันทร์–ศุกร์)
       </label>
       {% if form.weekdays.errors %}<p class="error-text">{{ form.weekdays.errors|join:", " }}</p>{% endif %}
     </div>
 
-    <!-- Time -->
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">{{ form.start_time.label }}</label>
+    <!-- Time range -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-600 mb-1.5">{{ form.start_time.label }}</label>
         {{ form.start_time }}
         {% if form.start_time.errors %}<p class="error-text">{{ form.start_time.errors|join:", " }}</p>{% endif %}
       </div>
-      <div class="form-group">
-        <label class="form-label">{{ form.end_time.label }}</label>
+      <div>
+        <label class="block text-sm font-medium text-gray-600 mb-1.5">{{ form.end_time.label }}</label>
         {{ form.end_time }}
         {% if form.end_time.errors %}<p class="error-text">{{ form.end_time.errors|join:", " }}</p>{% endif %}
       </div>
     </div>
 
-    <div class="card-footer" style="display:flex;gap:0.75rem;">
-      <button type="submit" class="btn btn-primary">ส่งคำขอจอง</button>
-      <a href="{% url 'dashboard' %}" class="btn btn-secondary">ยกเลิก</a>
-    </div>
-  </form>
+  </div>
 </div>
+
+<!-- ── Actions ── -->
+<div class="flex items-center gap-3">
+  <button type="submit"
+          class="flex items-center gap-2 bg-maroon hover:bg-maroon-dark text-white font-heading font-semibold px-7 py-3 rounded-xl transition-colors shadow-sm text-sm">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.269 20.876L5.999 12zm0 0h7.5"/>
+    </svg>
+    ส่งคำขอจอง
+  </button>
+  <a href="{% url 'dashboard' %}"
+     class="px-6 py-3 rounded-xl border border-gray-200 text-sm text-gray-600 hover:border-maroon hover:text-maroon transition-colors font-medium">
+    ยกเลิก
+  </a>
+</div>
+
+</form>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 function togglePurpose(val) {
-  document.getElementById('teaching-fields').style.display = (val === 'teaching') ? 'block' : 'none';
-  document.getElementById('training-fields').style.display = (val === 'training') ? 'block' : 'none';
+  document.getElementById('teaching-fields').classList.toggle('hidden', val !== 'teaching');
+  document.getElementById('training-fields').classList.toggle('hidden', val !== 'training');
 }
 
 (function() {
@@ -132,8 +248,8 @@ function togglePurpose(val) {
 
 document.getElementById('select-all-days').addEventListener('change', function() {
   document.querySelectorAll('input[name="weekdays"]').forEach(function(cb) {
-    cb.checked = document.getElementById('select-all-days').checked;
-  });
+    cb.checked = this.checked;
+  }, this);
 });
 </script>
 {% endblock %}

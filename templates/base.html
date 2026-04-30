@@ -44,8 +44,7 @@
       <a href="{% url 'bookings:list' %}" class="nav-link">การจองของฉัน</a>
       {% if user.role == 'admin' %}
       <a href="{% url 'bookings:pending' %}" class="nav-link">อนุมัติการจอง</a>
-      <a href="{% url 'reports:index' %}" class="nav-link">รายงาน</a>
-      <a href="{% url 'accounts:user_list' %}" class="nav-link">จัดการผู้ใช้</a>
+      <a href="{% url 'admin_panel:dashboard' %}" class="nav-link nav-link--admin">จัดการระบบ</a>
       {% endif %}
       <span class="nav-user">{{ user.full_name|default:user.username }}</span>
       <a href="{% url 'accounts:logout' %}" class="nav-link">ออกจากระบบ</a>
@@ -65,7 +64,7 @@
   </main>
 
   <footer class="site-footer">
-    <span>ระบบจองห้องประชุมและห้องเรียน &mdash; ภาควิชาวิศวกรรมไฟฟ้าและคอมพิวเตอร์ มหาวิทยาลัยธรรมศาสตร์</span>
+    <span>ระบบจองห้องประชุมและห้องเรียน &mdash; ภาควิชาวิศวกรรมศาสตร์ มหาวิทยาลัยธรรมศาสตร์</span>
     <div class="footer-logos">
       <img src="{% static 'images/TSE_logo.png' %}" alt="TSE" width="24" height="24" />
       <img src="{% static 'images/Emblem_of_Thammasat_University.png' %}" alt="Thammasat University" width="24" height="24" />
