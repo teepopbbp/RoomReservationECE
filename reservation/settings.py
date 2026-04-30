@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'bookings',
     'notifications',
     'reports',
+    'admin_panel',
 ]
 
 MIDDLEWARE = [
