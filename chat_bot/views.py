@@ -238,6 +238,7 @@ def handle_message(event):
         )
 
 
+# connect LINE account to TU account
 @login_required
 def line_connect(request):
     """Generate LINE Login URL for connecting LINE account to TU account"""
