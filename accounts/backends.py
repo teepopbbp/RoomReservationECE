@@ -12,6 +12,14 @@ class TURESTAPIBackend(BaseBackend):
         if not username or not password:
             return None
 
+        # Local password auth (superusers created via createsuperuser)
+        try:
+            user = CustomUser.objects.get(username=username)
+            if user.has_usable_password() and user.check_password(password):
+                return user
+        except CustomUser.DoesNotExist:
+            pass
+
         api_key = settings.TU_API_KEY
         if not api_key:
             # Fallback for development: allow any login when no API key is set

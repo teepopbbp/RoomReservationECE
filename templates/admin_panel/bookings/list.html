@@ -1,0 +1,92 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Admin — การจองทั้งหมด{% endblock %}
+
+{% block admin_content %}
+
+<div class="flex items-center justify-between mb-5">
+  <div>
+    <h2 class="font-heading font-bold text-maroon text-xl">การจองทั้งหมด</h2>
+    <p class="text-xs text-gray-400 mt-0.5">แสดง {{ bookings|length }} รายการล่าสุด</p>
+  </div>
+  <a href="{% url 'bookings:pending' %}"
+     class="flex items-center gap-2 bg-tseorg hover:bg-tseorg-dark text-maroon-dark text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+    อนุมัติรายการรอ →
+  </a>
+</div>
+
+<!-- Filters -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+  <form method="get" class="flex flex-wrap items-center gap-3">
+    <select name="status" class="text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-600 focus:outline-none focus:border-maroon">
+      <option value="">ทุกสถานะ</option>
+      {% for val, label in status_choices %}
+      <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <select name="room" class="text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-600 focus:outline-none focus:border-maroon">
+      <option value="">ทุกห้อง</option>
+      {% for r in rooms %}
+      <option value="{{ r.pk }}" {% if room_filter == r.pk|stringformat:"s" %}selected{% endif %}>{{ r.code }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit"
+            class="bg-maroon hover:bg-maroon-dark text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+      กรอง
+    </button>
+    {% if status_filter or room_filter %}
+    <a href="{% url 'admin_panel:booking_list' %}" class="text-sm text-gray-400 hover:text-maroon transition-colors">ล้างตัวกรอง</a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-maroon-light text-maroon text-xs font-heading font-semibold uppercase tracking-wide">
+      <tr>
+        <th class="px-5 py-3.5 text-left">ผู้จอง</th>
+        <th class="px-5 py-3.5 text-left">ห้อง</th>
+        <th class="px-5 py-3.5 text-left">วันที่</th>
+        <th class="px-5 py-3.5 text-left">เวลา</th>
+        <th class="px-5 py-3.5 text-left">วัตถุประสงค์</th>
+        <th class="px-5 py-3.5 text-center">สถานะ</th>
+        <th class="px-5 py-3.5 text-left">ผู้อนุมัติ</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-50">
+      {% for b in bookings %}
+      <tr class="hover:bg-gray-50 transition-colors">
+        <td class="px-5 py-3.5">
+          <div class="font-medium text-gray-800">{{ b.booker.display_name }}</div>
+          <div class="text-xs text-gray-400 font-mono">{{ b.booker.username }}</div>
+        </td>
+        <td class="px-5 py-3.5 font-heading font-bold text-maroon">{{ b.room.code }}</td>
+        <td class="px-5 py-3.5 text-gray-600">{{ b.date|date:"d/m/Y" }}</td>
+        <td class="px-5 py-3.5 text-gray-500 text-xs">{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</td>
+        <td class="px-5 py-3.5 text-gray-600 max-w-[200px]">
+          <div class="truncate text-xs">{{ b.purpose_label }}</div>
+        </td>
+        <td class="px-5 py-3.5 text-center">
+          {% if b.status == 'approved' %}
+          <span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full">อนุมัติ</span>
+          {% elif b.status == 'pending' %}
+          <span class="inline-block bg-amber-100 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-full">รอ</span>
+          {% elif b.status == 'rejected' %}
+          <span class="inline-block bg-red-100 text-red-700 text-xs font-semibold px-2.5 py-1 rounded-full">ปฏิเสธ</span>
+          {% else %}
+          <span class="inline-block bg-gray-100 text-gray-500 text-xs font-semibold px-2.5 py-1 rounded-full">ยกเลิก</span>
+          {% endif %}
+        </td>
+        <td class="px-5 py-3.5 text-xs text-gray-400">
+          {% if b.reviewed_by %}{{ b.reviewed_by.display_name }}{% else %}—{% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7" class="px-5 py-12 text-center text-gray-300 text-sm">ไม่มีข้อมูลการจอง</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

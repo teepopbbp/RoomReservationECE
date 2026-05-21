@@ -1,67 +1,175 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}หน้าหลัก — ระบบจองห้อง{% endblock %}
 
-{% block content %}
-<h2 style="font-size:1.3rem;font-weight:800;color:#1a237e;margin-bottom:1.25rem;">
-  ยินดีต้อนรับ, {{ user.full_name|default:user.username }}
-  <span style="font-size:0.85rem;font-weight:400;color:#666;margin-left:0.5rem;">
-    ({{ user.get_role_display }})
-  </span>
-</h2>
+{% block extra_css %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        maroon:  { DEFAULT: '#8A2329', dark: '#6b1a1f', light: '#f5e8e9' },
+        tseorg:  { DEFAULT: '#FBC24E', dark: '#d9a033' },
+      },
+      fontFamily: {
+        heading: ['Montserrat', 'Avenir Next', 'sans-serif'],
+      }
+    }
+  }
+}
+</script>
+{% endblock %}
 
-{% if user.role == 'admin' and pending_count is not None %}
-<div class="stats-grid">
-  <div class="stat-card">
-    <div class="stat-number">{{ pending_count }}</div>
-    <div class="stat-label">รายการรอการอนุมัติ</div>
+{% block content %}
+
+<!-- ── Welcome banner ── -->
+<div class="rounded-2xl overflow-hidden mb-6 bg-gradient-to-br from-maroon-dark via-maroon to-[#b83a20] shadow-lg">
+  <div class="flex items-center justify-between px-8 py-7">
+    <div>
+      <p class="text-tseorg text-sm font-heading font-semibold tracking-widest uppercase mb-1">
+        {{ user.get_role_display }}
+      </p>
+      <h2 class="text-white text-2xl font-heading font-bold leading-tight">
+        ยินดีต้อนรับ,<br>{{ user.full_name|default:user.username }}
+      </h2>
+    </div>
+    <img src="{% static 'images/TSE_logo.png' %}" alt="TSE"
+         class="w-20 h-20 object-contain opacity-90 drop-shadow-lg hidden sm:block">
   </div>
 </div>
+
+<!-- ── Admin: pending alert + stat ── -->
+{% if user.role == 'admin' and pending_count is not None %}
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+  <a href="{% url 'bookings:pending' %}"
+     class="flex items-center gap-4 bg-white rounded-xl px-5 py-4 shadow-sm border border-gray-100 hover:border-maroon transition-colors group">
+    <div class="w-12 h-12 rounded-full bg-maroon-light flex items-center justify-center shrink-0 group-hover:bg-maroon transition-colors">
+      <svg class="w-6 h-6 text-maroon group-hover:text-white transition-colors" fill="none" stroke="currentColor"
+           stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+      </svg>
+    </div>
+    <div>
+      <div class="text-3xl font-heading font-bold text-maroon">{{ pending_count }}</div>
+      <div class="text-xs text-gray-500 mt-0.5">รายการรอการอนุมัติ</div>
+    </div>
+  </a>
+</div>
+
 {% if pending_count > 0 %}
-<div class="alert alert-warning">
-  มีการจอง <strong>{{ pending_count }}</strong> รายการที่รอการอนุมัติ
-  — <a href="{% url 'bookings:pending' %}">คลิกเพื่อตรวจสอบ</a>
+<div class="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 mb-6 text-sm text-amber-800">
+  <svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+  </svg>
+  มีการจอง <strong class="mx-1">{{ pending_count }}</strong> รายการที่รอการอนุมัติ —
+  <a href="{% url 'bookings:pending' %}" class="ml-1 underline font-semibold hover:text-amber-900">คลิกเพื่อตรวจสอบ</a>
 </div>
 {% endif %}
 {% endif %}
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+<!-- ── Main grid ── -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-  <div class="card">
-    <h3 class="card-title">การจองที่กำลังจะมาถึง</h3>
+  <!-- Upcoming bookings -->
+  <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <h3 class="font-heading font-bold text-maroon text-base">การจองที่กำลังจะมาถึง</h3>
+      <a href="{% url 'bookings:list' %}"
+         class="text-xs text-maroon hover:text-maroon-dark font-semibold transition-colors">ดูทั้งหมด →</a>
+    </div>
+
     {% if upcoming %}
-    <table class="table">
-      <thead>
-        <tr><th>วันที่</th><th>ห้อง</th><th>เวลา</th><th>สถานะ</th></tr>
-      </thead>
-      <tbody>
-        {% for b in upcoming %}
-        <tr>
-          <td>{{ b.date|date:"d/m/Y" }}</td>
-          <td>{{ b.room.code }}</td>
-          <td>{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</td>
-          <td><span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <div style="margin-top:0.75rem;">
-      <a href="{% url 'bookings:list' %}" class="btn btn-outline btn-sm">ดูทั้งหมด</a>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-maroon-light text-maroon text-xs font-heading font-semibold uppercase tracking-wide">
+            <th class="px-6 py-3 text-left">วันที่</th>
+            <th class="px-6 py-3 text-left">ห้อง</th>
+            <th class="px-6 py-3 text-left">เวลา</th>
+            <th class="px-6 py-3 text-left">สถานะ</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for b in upcoming %}
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-3 text-gray-700">{{ b.date|date:"d/m/Y" }}</td>
+            <td class="px-6 py-3 font-semibold text-maroon">{{ b.room.code }}</td>
+            <td class="px-6 py-3 text-gray-500">{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</td>
+            <td class="px-6 py-3">
+              <span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
     {% else %}
-    <p style="color:#aaa;font-size:0.9rem;">ไม่มีการจองที่กำลังจะมาถึง</p>
+    <div class="flex flex-col items-center justify-center py-12 text-gray-400">
+      <svg class="w-12 h-12 mb-3 opacity-30" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5"/>
+      </svg>
+      <p class="text-sm">ไม่มีการจองที่กำลังจะมาถึง</p>
+    </div>
     {% endif %}
   </div>
 
-  <div class="card">
-    <h3 class="card-title">เมนูด่วน</h3>
-    <div style="display:grid;gap:0.75rem;">
-      <a href="{% url 'bookings:create' %}" class="btn btn-primary">+ จองห้องใหม่</a>
-      <a href="{% url 'bookings:calendar' %}" class="btn btn-outline">ดูปฏิทินห้องว่าง</a>
-      <a href="{% url 'bookings:list' %}" class="btn btn-outline">การจองของฉัน</a>
+  <!-- Quick menu -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h3 class="font-heading font-bold text-maroon text-base">เมนูด่วน</h3>
+    </div>
+    <div class="p-5 flex flex-col gap-3">
+
+      <a href="{% url 'bookings:create' %}"
+         class="flex items-center gap-3 bg-maroon hover:bg-maroon-dark text-white px-4 py-3 rounded-xl transition-colors font-semibold text-sm shadow-sm">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+        </svg>
+        จองห้องใหม่
+      </a>
+
+      <a href="{% url 'bookings:calendar' %}"
+         class="flex items-center gap-3 border border-maroon text-maroon hover:bg-maroon-light px-4 py-3 rounded-xl transition-colors text-sm font-medium">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5"/>
+        </svg>
+        ดูปฏิทินห้องว่าง
+      </a>
+
+      <a href="{% url 'bookings:list' %}"
+         class="flex items-center gap-3 border border-maroon text-maroon hover:bg-maroon-light px-4 py-3 rounded-xl transition-colors text-sm font-medium">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+        </svg>
+        การจองของฉัน
+      </a>
+
       {% if user.role == 'admin' %}
-      <a href="{% url 'bookings:pending' %}" class="btn btn-warning">รายการรออนุมัติ</a>
-      <a href="{% url 'reports:index' %}" class="btn btn-outline">รายงานสถิติ</a>
+      <a href="{% url 'bookings:pending' %}"
+         class="flex items-center gap-3 bg-tseorg hover:bg-tseorg-dark text-maroon-dark px-4 py-3 rounded-xl transition-colors text-sm font-semibold">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        รายการรออนุมัติ
+      </a>
+
+      <a href="{% url 'reports:index' %}"
+         class="flex items-center gap-3 border border-maroon text-maroon hover:bg-maroon-light px-4 py-3 rounded-xl transition-colors text-sm font-medium">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/>
+        </svg>
+        รายงานสถิติ
+      </a>
       {% endif %}
+
     </div>
   </div>
 

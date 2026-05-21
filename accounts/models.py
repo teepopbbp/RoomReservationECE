@@ -3,9 +3,12 @@ from django.db import models
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, username, **extra_fields):
+    def create_user(self, username, password=None, **extra_fields):
         user = self.model(username=username, **extra_fields)
-        user.set_unusable_password()
+        if password:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
         user.save(using=self._db)
         return user
 

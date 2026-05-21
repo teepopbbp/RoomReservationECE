@@ -1,35 +1,81 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}เข้าสู่ระบบ — ระบบจองห้อง ECE{% endblock %}
 
+{% block extra_css %}
+<style>
+  .navbar      { display: none; }
+  .site-footer { display: none; }
+  .page-body   { padding: 0; max-width: 100%; margin: 0; }
+  .lp-bg {
+    background-image: url("{% static 'images/TSE_Building.jpg' %}");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="max-width:420px;margin:3rem auto;">
-  <div class="card">
-    <h1 class="card-title" style="text-align:center;">เข้าสู่ระบบ</h1>
-    <p style="text-align:center;color:#666;margin-bottom:1.5rem;font-size:0.9rem;">
-      ระบบจองห้องประชุมและห้องเรียน<br>ภาควิชาวิศวกรรมไฟฟ้าและคอมพิวเตอร์
-    </p>
+<div class="lp-bg">
+  <div class="lp-wrap">
 
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {% for field in form %}
-      <div class="form-group">
-        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {% if field.errors %}
-          {% for err in field.errors %}
-          <p class="error-text">{{ err }}</p>
-          {% endfor %}
-        {% endif %}
+    <!-- Logo circle -->
+    <div class="lp-avatar">
+      <img src="{% static 'images/TSE_logo.png' %}" alt="TSE" width="105" height="105" style="object-fit:contain;">
+    </div>
+
+    <!-- Card -->
+    <div class="lp-card">
+
+      <h1 class="lp-title">เข้าสู่ระบบ</h1>
+      <p class="lp-sub">ระบบจองห้องประชุมและห้องเรียน<br>ภาควิชาวิศวกรรม</p>
+
+      {% if form.non_field_errors %}
+      <div class="lp-error">
+        {% for err in form.non_field_errors %}{{ err }}{% endfor %}
       </div>
-      {% endfor %}
-      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:0.5rem;">
-        เข้าสู่ระบบด้วย TU Account
-      </button>
-    </form>
+      {% endif %}
 
-    <p style="text-align:center;margin-top:1rem;font-size:0.78rem;color:#aaa;">
-      ใช้ Username/Password ของมหาวิทยาลัยธรรมศาสตร์
-    </p>
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <!-- Username -->
+        <div class="lp-field">
+          <span class="lp-field__icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                 stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </span>
+          {{ form.username }}
+          {% if form.username.errors %}
+          <p class="lp-field__error">{{ form.username.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Password -->
+        <div class="lp-field">
+          <span class="lp-field__icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                 stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </span>
+          {{ form.password }}
+          {% if form.password.errors %}
+          <p class="lp-field__error">{{ form.password.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="lp-btn">เข้าสู่ระบบ</button>
+      </form>
+
+      <p class="lp-note">ใช้ Username / Password ของมหาวิทยาลัยธรรมศาสตร์</p>
+    </div>
   </div>
 </div>
 {% endblock %}

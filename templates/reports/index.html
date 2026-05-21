@@ -6,19 +6,19 @@
   <h2 class="card-title">รายงานสถิติการใช้ห้อง</h2>
 
   <!-- Date filter -->
-  <form method="get" style="display:flex;align-items:flex-end;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;">
-    <div class="form-group" style="margin-bottom:0;">
+  <form method="get" class="filter-form">
+    <div class="form-group form-group--inline">
       <label class="form-label">วันเริ่มต้น</label>
-      <input type="date" name="start" value="{{ start_date|date:'Y-m-d' }}" class="form-control" style="width:auto;">
+      <input type="date" name="start" value="{{ start_date|date:'Y-m-d' }}" class="form-control form-control--auto">
     </div>
-    <div class="form-group" style="margin-bottom:0;">
+    <div class="form-group form-group--inline">
       <label class="form-label">วันสิ้นสุด</label>
-      <input type="date" name="end" value="{{ end_date|date:'Y-m-d' }}" class="form-control" style="width:auto;">
+      <input type="date" name="end" value="{{ end_date|date:'Y-m-d' }}" class="form-control form-control--auto">
     </div>
     <button type="submit" class="btn btn-primary">แสดงรายงาน</button>
   </form>
 
-  <!-- Summary -->
+  <!-- Summary stats -->
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-number">{{ total_bookings }}</div>
@@ -48,31 +48,42 @@
       <tbody>
         {% for s in room_stats %}
         <tr>
-          <td><strong>{{ s.room.code }}</strong><br><span style="font-size:0.8rem;color:#666;">{{ s.room.name }}</span></td>
-          <td>{{ s.room.get_room_type_display }}</td>
-          <td style="text-align:center;">{{ s.room.capacity }}</td>
-          <td style="text-align:center;font-weight:700;">{{ s.count }}</td>
-          <td style="text-align:center;">{{ s.hours }} ชม.</td>
           <td>
-            <div style="display:flex;align-items:center;gap:0.5rem;">
-              <div style="background:#e8eaf6;border-radius:4px;height:10px;width:80px;overflow:hidden;">
-                <div style="background:#3949ab;height:100%;width:{{ s.utilization }}%;"></div>
+            <strong>{{ s.room.code }}</strong><br>
+            <span class="text-sub">{{ s.room.name }}</span>
+          </td>
+          <td>{{ s.room.get_room_type_display }}</td>
+          <td class="td-center">{{ s.room.capacity }}</td>
+          <td class="td-center" style="font-weight:700;">{{ s.count }}</td>
+          <td class="td-center">{{ s.hours }} ชม.</td>
+          <td>
+            <div class="util-bar__wrap">
+              <div class="util-bar">
+                <div class="util-bar__fill" data-pct="{{ s.utilization }}"></div>
               </div>
-              <span style="font-size:0.82rem;">{{ s.utilization }}%</span>
+              <span class="text-sub">{{ s.utilization }}%</span>
             </div>
           </td>
-          <td style="text-align:center;">{{ s.teaching_count }}</td>
-          <td style="text-align:center;">{{ s.training_count }}</td>
+          <td class="td-center">{{ s.teaching_count }}</td>
+          <td class="td-center">{{ s.training_count }}</td>
         </tr>
         {% empty %}
-        <tr><td colspan="8" style="text-align:center;color:#aaa;padding:2rem;">ไม่มีข้อมูล</td></tr>
+        <tr><td colspan="8" class="td-empty">ไม่มีข้อมูล</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 
-  <p style="font-size:0.78rem;color:#aaa;margin-top:0.75rem;">
+  <p class="report-note">
     * อัตราการใช้งานคำนวณจากชั่วโมงที่ใช้งานเทียบกับเวลาเปิดทำการ 07:00–22:00 ในช่วงที่เลือก
   </p>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.util-bar__fill[data-pct]').forEach(function(el) {
+  el.style.width = el.dataset.pct + '%';
+});
+</script>
 {% endblock %}
