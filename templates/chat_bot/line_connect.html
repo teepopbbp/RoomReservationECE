@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}
+  LINE Account Connected — ระบบจองห้อง
+{% endblock %}
+
+{% block extra_css %}
+  <style>
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .success-icon {
+      font-size: 60px;
+      color: #28a745;
+      margin-bottom: 20px;
+    }
+    .btn-line {
+      display: inline-block;
+      background-color: #00c300;
+      color: white;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 4px;
+      margin: 10px;
+      font-weight: bold;
+    }
+    .btn-line:hover {
+      background-color: #00b000;
+      text-decoration: none;
+    }
+    .btn-dashboard {
+      display: inline-block;
+      background-color: #6c757d;
+      color: white;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 4px;
+      margin: 10px;
+    }
+    .btn-dashboard:hover {
+      background-color: #5a6268;
+      text-decoration: none;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="success-icon">✅</div>
+    <h1>เชื่อมต่อบัญชี LINE สำเร็จ!</h1>
+    <p>บัญชี LINE ของคุณถูกเชื่อมต่อกับบัญชี TU แล้ว</p>
+
+    <div>
+      <a href="https://line.me/R/ti/p/@040lofwv" class="btn-line" target="_blank">เปิด LINE เพื่อเพิ่มแชทบอทเป็นเพื่อน</a>
+      <a href="{% url 'dashboard' %}" class="btn-dashboard">ไปที่หน้าหลัก</a>
+    </div>
+
+    <p class="mt-4">ตอนนี้คุณสามารถใช้ LINE Chatbot เพื่อจองห้องได้ทันที โดยระบบจะรู้ว่าคุณเป็นใครจากบัญชี TU ที่เชื่อมต่อไว้</p>
+  </div>
+{% endblock %}

@@ -9,5 +9,5 @@ urlpatterns = [
     path("bookings/", include("bookings.urls")),
     path("reports/", include("reports.urls")),
     path("manage/", include("admin_panel.urls")),
-    path("webhook/", include("chat_bot.urls")),
+    path("webhook/", include("chat_bot.urls", namespace="chat_bot")),
 ]
