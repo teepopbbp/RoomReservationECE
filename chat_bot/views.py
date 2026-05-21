@@ -20,13 +20,12 @@ from linebot.v3.webhooks import MessageEvent, TextMessageContent
 # ไลบรารี Gemini API
 import google.generativeai as genai
 
-# นำเข้าโมเดลของคุณจาก Django (แก้ชื่อแอปพลิเคชันให้ตรงกับระบบของคุณ)
-from bookings.models import Booking  # สมมติว่า Booking อยู่ในแอป bookings
-from rooms.models import Room  # สมมติว่า Room อยู่ในแอป rooms
-from accounts.models import CustomUser
-from accounts.models import CustomUser  # สมมติว่านี่คือตารางเก็บ User ของคุณ
 
-# ตั้งค่าคอนฟิกูเรชัน (ระบบจะดึงจาก .env ที่คุณโหลดไว้ใน docker-compose อัตโนมัติ)
+from bookings.models import Booking
+from rooms.models import Room
+from accounts.models import CustomUser
+from accounts.models import CustomUser
+
 configuration = Configuration(access_token=os.environ.get("CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.environ.get("CHANNEL_SECRET"))
 
@@ -95,7 +94,7 @@ def handle_message(event):
             start_time = booking_data["start_time"]
             end_time = booking_data["end_time"]
 
-            # 2. ค้นหาห้องด้วย Django ORM (ไม่ต้องเขียน SQL เองแล้ว!)
+            # 2. ค้นหาห้องด้วย Django ORM
             try:
                 room = Room.objects.get(name=room_name)
 

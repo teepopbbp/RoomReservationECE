@@ -51,6 +51,20 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command:
+      - "http"
+      - "web:8000"
+      - "--domain=mulberry-negate-conjure.ngrok-free.dev"
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    ports:
+      - "4040:4040"
+    depends_on:
+      - web
 
 volumes:
   postgres_data:
+
