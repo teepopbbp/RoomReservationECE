@@ -75,76 +75,61 @@ def line_webhook(request):
     return HttpResponse(status=200)
 
 
+# ฟังก์ชันหลักเมื่อมีข้อความตัวอักษรพิมพ์เข้ามาใน LINE
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
     user_message = event.message.text
     user_id = event.source.user_id
     current_date = date.today().isoformat()
 
-    # 1. ดึงประวัติการคุยเก่า และ สร้างโครงสร้าง "สมุดจด" เริ่มต้น
+    # 1. ดึงประวัติการคุยเก่า และ "สมุดจด (State)" จาก Cache
     cache_key = f"chat_history_{user_id}"
-    state_key = f"chat_state_{user_id}"
+    state_key = f"chat_state_{user_id}"  # สร้างกระเป๋าความจำใหม่สำหรับ JSON
 
     chat_history = cache.get(cache_key, "")
+    current_state = cache.get(state_key, {})  # ดึงข้อมูลที่ AI เคยสกัดไว้รอบที่แล้ว
 
-    # กำหนดโครงสร้างข้อมูลให้ครบ เพื่อกัน Python เอ๋อ
-    default_state = {
-        "room": "",
-        "date": "",
-        "start_time": "",
-        "end_time": "",
-        "purpose_type": "",
-        "course_code": "",
-        "course_name": "",
-        "program": "",
-        "event_name": "",
-    }
-    current_state = cache.get(state_key, default_state)
-
-    # 2. ต่อประวัติข้อความ
+    # 2. เอาข้อความใหม่ไปต่อท้ายประวัติเดิม
     chat_history += f"\nลูกค้า: {user_message}"
 
-    # 3. Prompt: เอาสมุดจด (State) วางไว้บนสุดให้ AI เห็นชัดๆ ว่ามีอะไรแล้วบ้าง
+    # 3. เขียน Prompt โดยส่ง "สมุดจด" ไปให้ AI ดูด้วย
     prompt = f"""
     คุณคือพนักงานรับจองห้องประชุมของมหาวิทยาลัย ที่รับการจองห้องโดยมีอาจารย์และบุคลากรของมหาวิทยาลัยเป็นผู้ใช้งาน
     ข้อมูลอ้างอิง: วันนี้คือ {current_date}
     
-    [ข้อมูลที่รวบรวมได้แล้วในระบบ]
+    === ข้อมูลที่คุณรวบรวมได้แล้วในรอบที่แล้ว (Memory State) ===
     {json.dumps(current_state, ensure_ascii=False, indent=2)}
+    =======================================================
     
-    [ประวัติการสนทนาทั้งหมด]
-    {chat_history}
+    --- ประวัติการสนทนาทั้งหมด ---{chat_history}
+    ----------------------
 
-    คำสั่ง: นำ "ข้อมูลที่รวบรวมได้แล้ว" มาผนวกกับข้อมูลใหม่ใน "ประวัติการสนทนา" และตอบกลับเป็น JSON
+    คำสั่ง: ตรวจสอบประวัติการสนทนาและ "ข้อมูลที่คุณรวบรวมได้แล้ว" แล้วตอบกลับเป็น JSON เท่านั้น
     
-    กฎเหล็กที่ต้องปฏิบัติตามอย่างเคร่งครัด:
-    1. ห้ามดัดแปลงหรือย่อข้อมูลเก่าเด็ดขาด: ข้อมูลใดที่มีค่าอยู่แล้วใน [ข้อมูลที่รวบรวมได้แล้วในระบบ] ให้คุณ "คัดลอก" ค่านั้นมาใส่ใน extracted_data ให้เหมือนเดิมเป๊ะๆ ทุกตัวอักษร (เช่น ถ้าของเดิมคือ "ห้องประชุม 2" ห้ามแก้เป็น "2" เด็ดขาด) ยกเว้นลูกค้าสั่งเปลี่ยนข้อมูล
-    2. ห้ามถามซ้ำ: ข้อมูลไหนที่ลูกค้าบอกมาแล้ว และถูกบันทึกใน extracted_data แล้ว ห้ามทวงถามซ้ำเด็ดขาด!
-    3. ถามรวบยอดในครั้งเดียว: หากตรวจสอบแล้วพบว่ายังมีข้อมูลจำเป็นที่ "ขาดหายไป" ให้คุณลิสต์สิ่งที่ขาดทั้งหมด และถามลูกค้ากลับในข้อความเดียว ห้ามถามทีละคำถาม (เพื่อประหยัดเวลา)
-    4. ข้อมูลที่จำเป็นต้องมีให้ครบใน extracted_data :
-       - ข้อมูลพื้นฐาน (ต้องมีเสมอ): ชื่อห้อง (room), วันที่ (date YYYY-MM-DD), เวลาเริ่ม (start_time HH:MM), เวลาสิ้นสุด (end_time HH:MM), ประเภท (purpose_type วิเคราะห์เป็น teaching หรือ training)
-       - ถ้า purpose_type = teaching ต้องมีเพิ่ม: รหัสวิชา (course_code), ชื่อวิชา (course_name), หลักสูตร (program)
-       - ถ้า purpose_type = training ต้องมีเพิ่ม: ชื่องาน/กิจกรรม (event_name)
-       
-    เงื่อนไขรูปแบบของข้อมูล:
-       - รหัสวิชา: จะต้องขึ้นด้วยตัวอักษรภาษาอังกฤษสองตัวและตามด้วยตัวเลขสามตัว เช่น CN201, CN331, CN202, CN334
-       - หลักสูตร: ตอนนี้มีหลักสูตรแค่ ปริญญาตรีภาคปกติ, ปริญญาโท, TEP-TEPE, TU-PINE
-       
-    โครงสร้าง JSON ที่ต้องส่งกลับ (ห้ามมีข้อความธรรมดานอกกรอบ JSON):
+    กฎเหล็ก:
+    1. ห้ามลืมของเก่าเด็ดขาด: ให้นำข้อมูลจากกล่อง "Memory State" มารวมกับข้อความใหม่ของลูกค้า แล้วใส่ลงใน extracted_data ห้ามให้ข้อมูลที่เคยมีแล้วหายไป!
+    2. ถามรวบยอดในครั้งเดียว: หากยังมีข้อมูล "ขาดหายไป" ให้ลิสต์สิ่งที่ขาดทั้งหมด และถามกลับในข้อความเดียว ห้ามถามทีละคำถาม
+    3. ข้อมูลที่จำเป็นต้องมี:
+       - พื้นฐาน: ชื่อห้อง (room), วันที่ (date YYYY-MM-DD), เวลาเริ่ม (start_time HH:MM), เวลาสิ้นสุด (end_time HH:MM), ประเภท (purpose_type วิเคราะห์เป็น teaching หรือ training)
+       - ถ้า teaching: รหัสวิชา (course_code), ชื่อวิชา (course_name), หลักสูตร (program)
+       - ถ้า training: ชื่องาน (event_name)
+       *(หมายเหตุ: รหัสวิชาขึ้นต้นด้วยอักษร 2 ตัวตามด้วยเลข 3 ตัว เช่น CN334, หลักสูตรมีแค่ ปริญญาตรีภาคปกติ, ปริญญาโท, TEP-TEPE, TU-PINE)*
+        
+    โครงสร้าง JSON ที่ต้องส่งกลับ:
     {{
         "extracted_data": {{
-            "room": "(ข้อมูลที่หาเจอ ถ้าไม่มีให้ใส่ "")",
-            "date": "(ข้อมูลที่หาเจอ ถ้าไม่มีให้ใส่ "")",
-            "start_time": "(ข้อมูลที่หาเจอ ถ้าไม่มีให้ใส่ "")",
-            "end_time": "(ข้อมูลที่หาเจอ ถ้าไม่มีให้ใส่ "")",
-            "purpose_type": "(ข้อมูลที่หาเจอ ถ้าไม่มีให้ใส่ "")",
-            "course_code": "(ข้อมูลที่หาเจอ ถ้าไม่มีให้ใส่ "")",
-            "course_name": "(ข้อมูลที่หาเจอ ถ้าไม่มีให้ใส่ "")",
-            "program": "(ข้อมูลที่หาเจอ ถ้าไม่มีให้ใส่ "")",
-            "event_name": "(ข้อมูลที่หาเจอ ถ้าไม่มีให้ใส่ "")"
+            "room": "...",
+            "date": "...",
+            "start_time": "...",
+            "end_time": "...",
+            "purpose_type": "...",
+            "course_code": "...",
+            "course_name": "...",
+            "program": "...",
+            "event_name": "..."
         }},
-        "status": "(ใส่ 'complete' เมื่อข้อมูลจำเป็นครบ หรือ 'incomplete' หากยังขาด)",
-        "reply_message": "(หาก incomplete ให้พิมพ์ถามสิ่งที่ขาดหายไป 'ทั้งหมดในครั้งเดียว' อย่างสุภาพ เช่น 'รบกวนขอทราบ ชื่อห้อง, วันที่, และเวลาเริ่ม-สิ้นสุด ด้วยครับ' ห้ามถามทีละอย่าง. หาก complete ให้ใส่ "")"
+        "status": "(ใส่ 'complete' ถ้าครบ หรือ 'incomplete' ถ้าขาด)",
+        "reply_message": "(หาก incomplete ให้ถามสิ่งที่ขาดทั้งหมดอย่างสุภาพ ห้ามถามสิ่งที่อยู่ใน extracted_data แล้ว)"
     }}
     """
 
@@ -154,40 +139,17 @@ def handle_message(event):
 
         reply_text = ""
         is_complete = False
-        booking_data = {}
+        booking_data = {}  # เตรียมตัวแปรไว้เก็บสมุดจด
 
         try:
-            # ใช้ Regex ช่วยจับ JSON เผื่อ AI พิมพ์ข้อความแปลกๆ ปนมา
-            import re
-
             clean_json = response_text.replace("```json", "").replace("```", "").strip()
-            match = re.search(r"\{.*\}", clean_json, re.DOTALL)
-            if match:
-                clean_json = match.group(0)
-
             data = json.loads(clean_json)
 
-            ai_extracted = data.get("extracted_data", {})
+            booking_data = data.get("extracted_data", {})
             status = data.get("status", "incomplete")
             reply_text = data.get(
                 "reply_message", "ขออภัยครับ รบกวนแจ้งข้อมูลอีกครั้งครับ"
             )
-
-            # --- 🔥 MAGIC FIX: Python State Merge 🔥 ---
-            # บังคับเอาข้อมูลเก่าจากระบบ มาเติมเต็มส่วนที่ AI อาจจะลืม!
-            booking_data = default_state.copy()
-            for key, old_value in current_state.items():
-                new_value = ai_extracted.get(key, "")
-                # ถ้า AI หาข้อมูลใหม่เจอ ให้ใช้อันใหม่, แต่ถ้า AI ส่งค่าว่างมา ให้ใช้ของเก่า!
-                if (
-                    new_value
-                    and str(new_value).strip() != ""
-                    and str(new_value).lower() != "null"
-                ):
-                    booking_data[key] = str(new_value).strip()
-                else:
-                    booking_data[key] = old_value
-            # ----------------------------------------
 
             if status == "complete":
                 is_complete = True
@@ -249,17 +211,21 @@ def handle_message(event):
         except json.JSONDecodeError:
             reply_text = "ขออภัยครับ AI สับสนรูปแบบข้อมูล รบกวนพิมพ์บอกอีกครั้งครับ"
 
-        # 4. อัปเดต Cache ด้วยข้อมูลที่ Python ตรวจสอบความถูกต้องแล้ว (booking_data)
+        # 4. อัปเดตประวัติการสนทนา และ "สมุดจด (State)" ลง Cache
         if is_complete:
+            # จบงาน ลบความจำทิ้งทั้งคู่
             cache.delete(cache_key)
             cache.delete(state_key)
         else:
             chat_history += f"\nAI: {reply_text}"
             cache.set(cache_key, chat_history, timeout=300)
+            # สำคัญที่สุด! เซฟ JSON ข้อมูลที่หาได้ล่าสุดเอาไว้ให้ AI อ่านรอบหน้า
             cache.set(state_key, booking_data, timeout=300)
 
     except Exception as e:
         print(f"System Error: {e}", flush=True)
+        import traceback
+
         traceback.print_exc()
         reply_text = f"🚨 ระบบขัดข้อง 🚨\nตัวการคือ: {str(e)}"
 
