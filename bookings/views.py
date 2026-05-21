@@ -82,13 +82,80 @@ def create_booking_view(request):
 
 @login_required
 def my_bookings_view(request):
+    # ── My bookings ──
     bookings = (
         Booking.objects
         .filter(booker=request.user)
         .select_related('room')
         .order_by('-date', '-start_time')
     )
-    return render(request, 'bookings/list.html', {'bookings': bookings})
+
+    # ── Calendar ──
+    view_type = request.GET.get('view', 'week')
+    room_id   = request.GET.get('room', '')
+    offset    = int(request.GET.get('offset', 0))
+    today     = timezone.localdate()
+
+    rooms = Room.objects.filter(is_active=True)
+    selected_room = None
+    if room_id:
+        try:
+            selected_room = rooms.get(pk=int(room_id))
+        except (Room.DoesNotExist, ValueError):
+            pass
+
+    context = {
+        'bookings':      bookings,
+        'rooms':         rooms,
+        'selected_room': selected_room,
+        'view_type':     view_type,
+        'offset':        offset,
+        'today':         today,
+    }
+
+    if view_type == 'week':
+        week_start  = today - timedelta(days=today.weekday()) + timedelta(weeks=offset)
+        week_days   = [week_start + timedelta(days=i) for i in range(7)]
+        qs = Booking.objects.filter(
+            date__range=[week_days[0], week_days[-1]],
+            status__in=(Booking.STATUS_PENDING, Booking.STATUS_APPROVED),
+        ).select_related('room', 'booker')
+        if selected_room:
+            qs = qs.filter(room=selected_room)
+        day_bookings = {d: [] for d in week_days}
+        for b in qs:
+            if b.date in day_bookings:
+                day_bookings[b.date].append(b)
+        context.update({
+            'week_data':    [(d, day_bookings[d]) for d in week_days],
+            'prev_offset':  offset - 1,
+            'next_offset':  offset + 1,
+        })
+    else:
+        target_month = today.month + offset
+        target_year  = today.year + (target_month - 1) // 12
+        target_month = ((target_month - 1) % 12) + 1
+        first_day = date(target_year, target_month, 1)
+        _, days_in_month = cal_module.monthrange(target_year, target_month)
+        last_day  = date(target_year, target_month, days_in_month)
+        qs = Booking.objects.filter(
+            date__range=[first_day, last_day],
+            status__in=(Booking.STATUS_PENDING, Booking.STATUS_APPROVED),
+        ).select_related('room', 'booker')
+        if selected_room:
+            qs = qs.filter(room=selected_room)
+        date_bookings = {}
+        for b in qs:
+            date_bookings.setdefault(b.date.day, []).append(b)
+        context.update({
+            'month_label':    f'{target_month:02d}/{target_year}',
+            'weeks':          cal_module.monthcalendar(target_year, target_month),
+            'date_bookings':  date_bookings,
+            'prev_offset':    offset - 1,
+            'next_offset':    offset + 1,
+        })
+
+    return render(request, 'bookings/list.html', context)
 
 
 @login_required
@@ -159,6 +226,13 @@ def reject_booking_view(request, booking_id):
 
 @login_required
 def calendar_view(request):
+    # Calendar is now merged into the list page
+    params = request.GET.urlencode()
+    return redirect(f"/bookings/?{params}" if params else "/bookings/")
+
+
+@login_required
+def _old_calendar_view(request):
     view_type = request.GET.get('view', 'week')
     room_id = request.GET.get('room', '')
     offset = int(request.GET.get('offset', 0))
