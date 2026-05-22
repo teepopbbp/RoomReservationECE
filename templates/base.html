@@ -39,8 +39,8 @@
     {% if user.is_authenticated %}
     <div class="navbar-nav">
       <a href="{% url 'dashboard' %}" class="nav-link">หน้าหลัก</a>
-      <!-- <a href="{% url 'bookings:calendar' %}" class="nav-link">ปฏิทิน</a> -->
       <a href="{% url 'bookings:create' %}" class="nav-link">จองห้อง</a>
+      <a href="{% url 'bookings:calendar' %}" class="nav-link">ปฏิทินการจอง</a>
       <a href="{% url 'bookings:list' %}" class="nav-link">การจองของฉัน</a>
       {% if user.role == 'admin' %}
       <a href="{% url 'bookings:pending' %}" class="nav-link">อนุมัติการจอง</a>
@@ -55,11 +55,13 @@
   </nav>
 
   <main class="page-body">
+    {% block messages %}
     {% if messages %}
       {% for message in messages %}
       <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
       {% endfor %}
     {% endif %}
+    {% endblock %}
     {% block content %}{% endblock %}
   </main>
 

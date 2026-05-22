@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% block title %}ยืนยันการยกเลิก{% endblock %}
 
+{% comment %}Suppress messages here — success/error will show on the list page after redirect{% endcomment %}
+{% block messages %}{% endblock %}
+
 {% block content %}
 <div class="confirm-wrap">
   <div class="card">

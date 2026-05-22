@@ -3,10 +3,11 @@ from django.urls import path, include
 from bookings.views import dashboard_view
 
 urlpatterns = [
-    path('django-admin/', admin.site.urls),
-    path('', dashboard_view, name='dashboard'),
-    path('', include('accounts.urls')),
-    path('bookings/', include('bookings.urls')),
-    path('reports/', include('reports.urls')),
-    path('manage/', include('admin_panel.urls')),
+    path("django-admin/", admin.site.urls),
+    path("", dashboard_view, name="dashboard"),
+    path("", include("accounts.urls")),
+    path("bookings/", include("bookings.urls")),
+    path("reports/", include("reports.urls")),
+    path("manage/", include("admin_panel.urls")),
+    path("webhook/", include("chat_bot.urls", namespace="chat_bot")),
 ]

@@ -150,6 +150,15 @@ tailwind.config = {
         การจองของฉัน
       </a>
 
+      <!-- LINE Connect Button -->
+      <a href="{% url 'chat_bot:line_connect' %}"
+         class="flex items-center gap-3 bg-[#00c300] hover:bg-[#00b000] text-white px-4 py-3 rounded-xl transition-colors text-sm font-medium">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M7.5 22h9c2.206 0 4-1.794 4-4v-9c0-2.206-1.794-4-4-4h-9c-2.206 0-4 1.794-4 4v9c0 2.206 1.794 4 4 4zM9 13h6v-2H9v2zm0-4h6V7H9v2z" fill="white"/>
+        </svg>
+        เชื่อมต่อ LINE
+      </a>
+
       {% if user.role == 'admin' %}
       <a href="{% url 'bookings:pending' %}"
          class="flex items-center gap-3 bg-tseorg hover:bg-tseorg-dark text-maroon-dark px-4 py-3 rounded-xl transition-colors text-sm font-semibold">
