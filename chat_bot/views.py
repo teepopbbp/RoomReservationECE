@@ -1,7 +1,7 @@
 import json
 import os
 import traceback
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, time, timedelta
 from django.http import (
     HttpResponse,
     HttpResponseNotAllowed,
@@ -41,6 +41,7 @@ import google.generativeai as genai
 from bookings.models import Booking
 from rooms.models import Room
 from accounts.models import CustomUser
+from notifications.utils import send_booking_pending_email
 from django.conf import settings
 from urllib.parse import urlencode
 
@@ -198,6 +199,13 @@ def handle_message(event):
                                 program=booking_data.get("program") or "",
                                 event_name=booking_data.get("event_name") or "",
                                 status=Booking.STATUS_PENDING,
+                            )
+                            send_booking_pending_email(
+                                booker,
+                                room,
+                                [date.fromisoformat(booking_date)],
+                                time.fromisoformat(start_time),
+                                time.fromisoformat(end_time),
                             )
                             reply_text = f"✅ จองห้องสำเร็จเรียบร้อยแล้ว!\n\nสรุปการจอง:\n- ห้อง: {room.name}\n- วันที่: {booking_date}\n- เวลา: {start_time} ถึง {end_time}\n- สถานะ: รอการอนุมัติ\n\nขอบคุณที่ใช้บริการครับ"
 
