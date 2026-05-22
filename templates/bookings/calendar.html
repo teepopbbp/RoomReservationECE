@@ -112,13 +112,17 @@ tailwind.config = {
 </div>
 
 <!-- ── Legend ── -->
-<div class="flex items-center gap-4 mb-4 px-1">
+<div class="flex items-center gap-4 mb-4 px-1 flex-wrap">
   <span class="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
     <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span> รอการอนุมัติ
   </span>
   <span class="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
     <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> อนุมัติแล้ว
   </span>
+  <label class="flex items-center gap-2 cursor-pointer ml-2 select-none">
+    <input type="checkbox" id="mine-only" class="w-4 h-4 accent-[#8A2329] rounded">
+    <span class="text-xs text-gray-600 font-medium">แสดงเฉพาะการจองของฉัน</span>
+  </label>
 </div>
 
 {% if view_type == 'week' %}
@@ -138,12 +142,12 @@ tailwind.config = {
     <div class="bg-amber-50 min-h-[160px] p-2 space-y-1.5">
       {% for b in blist %}
       {% if b.status == 'approved' %}
-      <div class="rounded-lg bg-emerald-500 text-white px-2 py-1.5 text-xs leading-snug">
+      <div class="cal-chip rounded-lg bg-emerald-500 text-white px-2 py-1.5 text-xs leading-snug" data-mine="{% if b.booker == request.user %}1{% else %}0{% endif %}">
         <div class="font-bold">{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</div>
         <div class="opacity-90">{{ b.room.code }}</div>
       </div>
       {% else %}
-      <div class="rounded-lg bg-amber-400 text-amber-900 px-2 py-1.5 text-xs leading-snug">
+      <div class="cal-chip rounded-lg bg-amber-400 text-amber-900 px-2 py-1.5 text-xs leading-snug" data-mine="{% if b.booker == request.user %}1{% else %}0{% endif %}">
         <div class="font-bold">{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</div>
         <div class="opacity-80">{{ b.room.code }} (รอ)</div>
       </div>
@@ -164,12 +168,12 @@ tailwind.config = {
     <div class="bg-white min-h-[160px] p-2 space-y-1.5">
       {% for b in blist %}
       {% if b.status == 'approved' %}
-      <div class="rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 px-2 py-1.5 text-xs leading-snug">
+      <div class="cal-chip rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 px-2 py-1.5 text-xs leading-snug" data-mine="{% if b.booker == request.user %}1{% else %}0{% endif %}">
         <div class="font-bold">{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</div>
         <div class="opacity-75">{{ b.room.code }}</div>
       </div>
       {% else %}
-      <div class="rounded-lg bg-amber-50 border border-amber-200 text-amber-800 px-2 py-1.5 text-xs leading-snug">
+      <div class="cal-chip rounded-lg bg-amber-50 border border-amber-200 text-amber-800 px-2 py-1.5 text-xs leading-snug" data-mine="{% if b.booker == request.user %}1{% else %}0{% endif %}">
         <div class="font-bold">{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</div>
         <div class="opacity-75">{{ b.room.code }} (รอ)</div>
       </div>
@@ -220,8 +224,7 @@ tailwind.config = {
           {% for k, blist in date_bookings.items %}
             {% if k == day_num %}
               {% for b in blist %}
-              <div class="rounded bg-{% if b.status == 'approved' %}emerald-500{% else %}amber-400{% endif %}
-                          text-white text-[10px] px-1.5 py-0.5 mb-0.5 truncate font-medium">
+              <div class="cal-chip rounded text-white text-[10px] px-1.5 py-0.5 mb-0.5 truncate font-medium {% if b.status == 'approved' %}bg-emerald-500{% else %}bg-amber-400{% endif %}" data-mine="{% if b.booker == request.user %}1{% else %}0{% endif %}">
                 {{ b.start_time|time:"H:i" }} {{ b.room.code }}
               </div>
               {% endfor %}
@@ -235,8 +238,7 @@ tailwind.config = {
           {% for k, blist in date_bookings.items %}
             {% if k == day_num %}
               {% for b in blist %}
-              <div class="rounded bg-{% if b.status == 'approved' %}emerald-100 text-emerald-700 border border-emerald-200{% else %}amber-100 text-amber-700 border border-amber-200{% endif %}
-                          text-[10px] px-1.5 py-0.5 mb-0.5 truncate font-medium">
+              <div class="cal-chip rounded text-[10px] px-1.5 py-0.5 mb-0.5 truncate font-medium {% if b.status == 'approved' %}bg-emerald-100 text-emerald-700 border border-emerald-200{% else %}bg-amber-100 text-amber-700 border border-amber-200{% endif %}" data-mine="{% if b.booker == request.user %}1{% else %}0{% endif %}">
                 {{ b.start_time|time:"H:i" }} {{ b.room.code }}
               </div>
               {% endfor %}
@@ -250,4 +252,18 @@ tailwind.config = {
 </div>
 {% endif %}
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('mine-only').addEventListener('change', function () {
+  document.querySelectorAll('.cal-chip').forEach(function (chip) {
+    if (this.checked && chip.dataset.mine === '0') {
+      chip.style.display = 'none';
+    } else {
+      chip.style.display = '';
+    }
+  }, this);
+});
+</script>
 {% endblock %}
