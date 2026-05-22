@@ -1,62 +1,116 @@
 {% extends 'base.html' %}
-{% block title %}
-  LINE Account Connected — ระบบจองห้อง
-{% endblock %}
+{% block title %}เชื่อมต่อ LINE สำเร็จ — ระบบจองห้อง{% endblock %}
 
 {% block extra_css %}
-  <style>
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 40px 20px;
-      text-align: center;
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        maroon: { DEFAULT: '#8A2329', dark: '#6b1a1f', light: '#f5e8e9' },
+        tseorg: { DEFAULT: '#FBC24E', dark: '#d9a033' },
+        line:   { DEFAULT: '#00c300', dark: '#00a300' },
+      },
+      fontFamily: {
+        heading: ['Montserrat', 'Avenir Next', 'sans-serif'],
+      }
     }
-    .success-icon {
-      font-size: 60px;
-      color: #28a745;
-      margin-bottom: 20px;
-    }
-    .btn-line {
-      display: inline-block;
-      background-color: #00c300;
-      color: white;
-      padding: 12px 24px;
-      text-decoration: none;
-      border-radius: 4px;
-      margin: 10px;
-      font-weight: bold;
-    }
-    .btn-line:hover {
-      background-color: #00b000;
-      text-decoration: none;
-    }
-    .btn-dashboard {
-      display: inline-block;
-      background-color: #6c757d;
-      color: white;
-      padding: 12px 24px;
-      text-decoration: none;
-      border-radius: 4px;
-      margin: 10px;
-    }
-    .btn-dashboard:hover {
-      background-color: #5a6268;
-      text-decoration: none;
-    }
-  </style>
+  }
+}
+</script>
 {% endblock %}
 
 {% block content %}
-  <div class="container">
-    <div class="success-icon">✅</div>
-    <h1>เชื่อมต่อบัญชี LINE สำเร็จ!</h1>
-    <p>บัญชี LINE ของคุณถูกเชื่อมต่อกับบัญชี TU แล้ว</p>
+<div class="min-h-[70vh] flex items-center justify-center py-10 px-4">
+  <div class="w-full max-w-lg">
 
-    <div>
-      <a href="https://line.me/R/ti/p/@040lofwv" class="btn-line" target="_blank">เปิด LINE เพื่อเพิ่มแชทบอทเป็นเพื่อน</a>
-      <a href="{% url 'dashboard' %}" class="btn-dashboard">ไปที่หน้าหลัก</a>
+    <!-- Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+      <!-- Header bar -->
+      <div class="bg-gradient-to-r from-line to-[#00a300] px-8 py-6 flex items-center gap-4">
+        <!-- LINE icon -->
+        <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
+          <svg viewBox="0 0 48 48" class="w-9 h-9" fill="white">
+            <path d="M24 4C13 4 4 11.8 4 21.4c0 8.2 7.3 15.1 17.2 16.6.7.1 1.6.5 1.8 1.1.2.5.1 1.4.1 1.4l-.3 1.7c-.1.5-.4 2 1.8 1.1 2.1-.9 11.5-6.8 15.7-11.6C43.2 28.3 44 25 44 21.4 44 11.8 35 4 24 4z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-white/80 text-xs font-heading font-semibold tracking-widest uppercase">LINE Chatbot</p>
+          <h1 class="text-white text-xl font-heading font-bold leading-tight">เชื่อมต่อบัญชีสำเร็จ!</h1>
+        </div>
+        <!-- Checkmark badge -->
+        <div class="ml-auto w-10 h-10 bg-white rounded-full flex items-center justify-center shrink-0 shadow">
+          <svg class="w-6 h-6 text-line" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="px-8 py-6">
+        <p class="text-gray-600 text-sm leading-relaxed mb-6">
+          บัญชี LINE ของคุณถูกเชื่อมต่อกับบัญชี TU เรียบร้อยแล้ว
+          ตอนนี้คุณสามารถใช้ LINE Chatbot เพื่อจองห้อง ตรวจสอบสถานะ
+          และรับการแจ้งเตือนได้ทันที
+        </p>
+
+        <!-- Steps -->
+        <div class="space-y-3 mb-7">
+          <p class="text-xs font-heading font-semibold text-maroon uppercase tracking-widest mb-2">ขั้นตอนถัดไป</p>
+
+          <div class="flex items-start gap-3 bg-maroon-light rounded-xl px-4 py-3">
+            <span class="w-6 h-6 rounded-full bg-maroon text-white text-xs font-heading font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+            <p class="text-sm text-maroon-dark">
+              กดปุ่ม <strong>เพิ่มบอทเป็นเพื่อน</strong> เพื่อเริ่มใช้งาน LINE Chatbot
+            </p>
+          </div>
+
+          <div class="flex items-start gap-3 bg-gray-50 rounded-xl px-4 py-3">
+            <span class="w-6 h-6 rounded-full bg-gray-300 text-white text-xs font-heading font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+            <p class="text-sm text-gray-600">
+              พิมพ์ <strong class="text-gray-800">"จองห้อง"</strong> หรือ <strong class="text-gray-800">"สถานะ"</strong> ใน LINE เพื่อเริ่มต้นใช้งาน
+            </p>
+          </div>
+
+          <div class="flex items-start gap-3 bg-gray-50 rounded-xl px-4 py-3">
+            <span class="w-6 h-6 rounded-full bg-gray-300 text-white text-xs font-heading font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+            <p class="text-sm text-gray-600">
+              ระบบจะระบุตัวตนจากบัญชี TU ที่เชื่อมต่อไว้โดยอัตโนมัติ
+            </p>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <a href="https://line.me/R/ti/p/@040lofwv"
+             target="_blank" rel="noopener noreferrer"
+             class="flex items-center justify-center gap-2 bg-line hover:bg-line-dark text-white font-heading font-semibold text-sm px-5 py-3 rounded-xl transition-colors shadow-sm flex-1">
+            <svg viewBox="0 0 48 48" class="w-5 h-5 shrink-0" fill="white">
+              <path d="M24 4C13 4 4 11.8 4 21.4c0 8.2 7.3 15.1 17.2 16.6.7.1 1.6.5 1.8 1.1.2.5.1 1.4.1 1.4l-.3 1.7c-.1.5-.4 2 1.8 1.1 2.1-.9 11.5-6.8 15.7-11.6C43.2 28.3 44 25 44 21.4 44 11.8 35 4 24 4z"/>
+            </svg>
+            เพิ่มบอทเป็นเพื่อน
+          </a>
+
+          <a href="{% url 'dashboard' %}"
+             class="flex items-center justify-center gap-2 border border-maroon text-maroon hover:bg-maroon-light font-heading font-semibold text-sm px-5 py-3 rounded-xl transition-colors flex-1">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
+            </svg>
+            กลับหน้าหลัก
+          </a>
+        </div>
+      </div>
+
     </div>
 
-    <p class="mt-4">ตอนนี้คุณสามารถใช้ LINE Chatbot เพื่อจองห้องได้ทันที โดยระบบจะรู้ว่าคุณเป็นใครจากบัญชี TU ที่เชื่อมต่อไว้</p>
+    <!-- Footer note -->
+    <p class="text-center text-xs text-gray-400 mt-4">
+      ระบบจองห้อง — ภาควิชาวิศวกรรมศาสตร์ มหาวิทยาลัยธรรมศาสตร์
+    </p>
+
   </div>
+</div>
 {% endblock %}

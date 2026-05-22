@@ -22,9 +22,7 @@ docker compose up --build
 docker compose exec web python manage.py migrate
 # 3. โหลดข้อมูลตัวอย่าง
 docker compose exec web python manage.py loaddata fixtures/initial_data.json
-# 4. สร้าง superuser (ถ้าจําเป็น)
-docker compose exec web python manage.py createsuperuser
-# 5. เปิดในเบราว์เซอร์
+# 4. เปิดในเบราว์เซอร์
 http://localhost:8000
 ```
 ## บัญชีสําหรับทดสอบ 
