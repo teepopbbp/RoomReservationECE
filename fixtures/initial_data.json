@@ -1,0 +1,203 @@
+[
+  {
+    "model": "accounts.customuser",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$KSGxo4WlHycKsFmHdjK5aV$u+xM0GjMBxJSYDGc5EgeX9HoYJdbWN9c8Ip/0zKR2cQ=",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "admin",
+      "email": "admin@example.com",
+      "full_name": "ผู้ดูแลระบบ",
+      "role": "admin",
+      "is_active": true,
+      "is_staff": true,
+      "line_user_id": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.customuser",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$7L1SlmFU7vL4qZ7BLwhShv$KsbLjscOGEWtfCDAtYgs/SAdKZsDm/BpoSVasf80tuI=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "testuser",
+      "email": "testuser@example.com",
+      "full_name": "อาจารย์ทดสอบ",
+      "role": "lecturer",
+      "is_active": true,
+      "is_staff": false,
+      "line_user_id": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "rooms.room",
+    "pk": 1,
+    "fields": {
+      "code": "406-3",
+      "name": "ห้องประชุม 1",
+      "room_type": "meeting",
+      "capacity": 60,
+      "is_active": true
+    }
+  },
+  {
+    "model": "rooms.room",
+    "pk": 2,
+    "fields": {
+      "code": "406-5",
+      "name": "ห้องประชุม 2",
+      "room_type": "meeting",
+      "capacity": 15,
+      "is_active": true
+    }
+  },
+  {
+    "model": "rooms.room",
+    "pk": 3,
+    "fields": {
+      "code": "408-1",
+      "name": "ห้องประชุม 3",
+      "room_type": "meeting",
+      "capacity": 10,
+      "is_active": true
+    }
+  },
+  {
+    "model": "rooms.room",
+    "pk": 4,
+    "fields": {
+      "code": "408-2/1",
+      "name": "ห้องบรรยาย 1",
+      "room_type": "classroom",
+      "capacity": 20,
+      "is_active": true
+    }
+  },
+  {
+    "model": "rooms.room",
+    "pk": 5,
+    "fields": {
+      "code": "408-2/2",
+      "name": "ห้องบรรยาย 2",
+      "room_type": "classroom",
+      "capacity": 20,
+      "is_active": true
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 1,
+    "fields": {
+      "room": 1,
+      "booker": 2,
+      "recurring_group": null,
+      "purpose_type": "teaching",
+      "course_code": "CN334",
+      "course_name": "Web Engineering",
+      "program": "bachelor",
+      "event_name": "",
+      "date": "2026-06-02",
+      "start_time": "09:00:00",
+      "end_time": "12:00:00",
+      "status": "pending",
+      "rejection_reason": "",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "created_at": "2026-05-22T08:00:00Z"
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 2,
+    "fields": {
+      "room": 4,
+      "booker": 2,
+      "recurring_group": null,
+      "purpose_type": "teaching",
+      "course_code": "CN333",
+      "course_name": "Database Systems",
+      "program": "master",
+      "event_name": "",
+      "date": "2026-06-05",
+      "start_time": "13:00:00",
+      "end_time": "16:00:00",
+      "status": "approved",
+      "rejection_reason": "",
+      "reviewed_by": 1,
+      "reviewed_at": "2026-05-22T09:00:00Z",
+      "created_at": "2026-05-22T07:00:00Z"
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 3,
+    "fields": {
+      "room": 3,
+      "booker": 2,
+      "recurring_group": null,
+      "purpose_type": "training",
+      "course_code": "",
+      "course_name": "",
+      "program": "",
+      "event_name": "อบรม Python เบื้องต้น",
+      "date": "2026-05-15",
+      "start_time": "09:00:00",
+      "end_time": "12:00:00",
+      "status": "rejected",
+      "rejection_reason": "ห้องไม่ว่างในช่วงเวลาดังกล่าว",
+      "reviewed_by": 1,
+      "reviewed_at": "2026-05-14T10:00:00Z",
+      "created_at": "2026-05-13T08:00:00Z"
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 4,
+    "fields": {
+      "room": 5,
+      "booker": 2,
+      "recurring_group": null,
+      "purpose_type": "teaching",
+      "course_code": "CN101",
+      "course_name": "Introduction to Computer",
+      "program": "tep",
+      "event_name": "",
+      "date": "2026-05-10",
+      "start_time": "10:00:00",
+      "end_time": "13:00:00",
+      "status": "cancelled",
+      "rejection_reason": "",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "created_at": "2026-05-09T08:00:00Z"
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 5,
+    "fields": {
+      "room": 2,
+      "booker": 2,
+      "recurring_group": null,
+      "purpose_type": "teaching",
+      "course_code": "CN432",
+      "course_name": "Machine Learning",
+      "program": "tupine",
+      "event_name": "",
+      "date": "2026-06-10",
+      "start_time": "08:00:00",
+      "end_time": "11:00:00",
+      "status": "pending",
+      "rejection_reason": "",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "created_at": "2026-05-22T10:00:00Z"
+    }
+  }
+]
